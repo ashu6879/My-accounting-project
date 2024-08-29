@@ -1,0 +1,101 @@
+import React from 'react';
+import { Button, TextField, Container, Typography, Snackbar, Alert } from '@mui/material';
+import useAuth from 'hooks/useAuth'; // Import the custom hook
+import { useNavigate } from 'react-router-dom'; // Add navigation hook
+
+const AddProject = () => {
+  const [category, setCategory] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [success, setSuccess] = React.useState('');
+  const { isAuthenticated, loading } = useAuth(); // Use the custom hook
+  const navigate = useNavigate(); // Initialize the navigation hook
+
+  const handleChange = (e) => {
+    setCategory(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('http://localhost:81/projectcategories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pcName: category }), // Updated field name to 'pcName'
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to add category');
+      }
+
+      setSuccess('Project Category added successfully!');
+      setCategory('');
+
+      // Redirect to the categories list or any other page
+      setTimeout(() => {
+        navigate('/project/edit');
+      }, 2000);
+
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator while checking authentication
+  }
+
+  if (!isAuthenticated) {
+    return null; // Optionally handle redirection or render nothing
+  }
+
+  return (
+    <Container maxWidth="sm">
+      <Typography variant="h4" gutterBottom>
+        Add Project Category
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Category Name"
+          variant="outlined"
+          fullWidth
+          value={category}
+          onChange={handleChange}
+          margin="normal"
+          required
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+        >
+          Add Category
+        </Button>
+      </form>
+
+      {/* Success Snackbar */}
+      {success && (
+        <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
+          <Alert onClose={() => setSuccess('')} severity="success" sx={{ width: '100%' }}>
+            {success}
+          </Alert>
+        </Snackbar>
+      )}
+
+      {/* Error Snackbar */}
+      {error && (
+        <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError('')}>
+          <Alert onClose={() => setError('')} severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
+    </Container>
+  );
+};
+
+export default AddProject;
