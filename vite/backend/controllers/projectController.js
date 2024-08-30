@@ -5,9 +5,17 @@ exports.addProject = async (req, res) => {
   try {
     const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat } = req.body;
 
+    // Check if a project with the same title already exists
+    const existingProject = await Client.findOne({ projectTitle });
+    if (existingProject) {
+      return res.status(400).send('Project with this title already exists');
+    }
+
     // Check if the client already exists based on clientID
     const existingClient = await Client.findOne({ clientID });
-    if (existingClient) return res.status(400).send('Client with this ID already exists');
+    if (existingClient) {
+      return res.status(400).send('Client with this ID already exists');
+    }
 
     // Create a new client
     const newClient = new Client({ projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat });
@@ -24,6 +32,7 @@ exports.addProject = async (req, res) => {
     res.status(500).send('Error creating client');
   }
 };
+
 
 // Get a list of clients
 exports.getProject = async (req, res) => {
