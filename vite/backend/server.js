@@ -12,7 +12,7 @@ connectDB();
 
 // Configure CORS
 const corsOptions = {
-  origin: '*',
+  origin: '*', // Adjust this as needed for security
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -23,6 +23,17 @@ app.use(bodyParser.json());
 
 // Use unified routes
 app.use('/', routes);
+
+// Handle 404 errors for unhandled routes
+app.use((req, res, next) => {
+  res.status(404).send('Not Found');
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000;
