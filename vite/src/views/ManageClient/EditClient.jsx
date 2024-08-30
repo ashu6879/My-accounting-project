@@ -319,7 +319,7 @@ const CategoryList = () => {
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {categories.map((category) => (
-              <MenuItem key={category._id} value={category._id}>
+              <MenuItem key={category.ccName} value={category.ccName}>
                 {category.ccName}
               </MenuItem>
             ))}

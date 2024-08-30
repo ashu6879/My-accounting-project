@@ -356,7 +356,7 @@ const ProjectList = () => {
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {projectCategories.map((category) => (
-              <MenuItem key={category._id} value={category._id}>
+              <MenuItem key={category.pcName} value={category.pcName}>
                 {category.pcName}
               </MenuItem>
             ))}
@@ -370,7 +370,7 @@ const ProjectList = () => {
             onChange={(e) => setUpdateclientCategory(e.target.value)}
           >
             {clientCategories.map((category) => (
-              <MenuItem key={category._id} value={category._id}>
+              <MenuItem key={category.ccName} value={category.ccName}>
                 {category.ccName}
               </MenuItem>
             ))}
