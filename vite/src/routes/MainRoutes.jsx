@@ -22,6 +22,8 @@ const AddClient = Loadable(lazy(() => import('views/ManageClient/AddClient'))); 
 const EditClient = Loadable(lazy(() => import('views/ManageClient/EditClient'))); // Adjust the path as needed
 const AddProject = Loadable(lazy(() => import('views/ManageProject/Add_project'))); // Adjust the path as needed
 const EditProject = Loadable(lazy(() => import('views/ManageProject/Edit_project'))); // Adjust the path as needed
+const AddInvoice = Loadable(lazy(() => import('views/ManageInvoice/AddInvoice'))); // Adjust the path as needed
+const EditInvoice = Loadable(lazy(() => import('views/ManageInvoice/Editinvoice'))); // Adjust the path as needed
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -105,6 +107,20 @@ const MainRoutes = {
         {
           path: 'edit',  // The :id parameter allows editing specific categories
           element: <EditProject />  // EditCategory page content inside MainLayout
+        }
+      ]
+    },
+    {
+      path: 'ManageInvoice',
+      element: <MainLayout />,  // MainLayout as the wrapper
+      children: [
+        {
+          path: 'add',
+          element: <AddInvoice />  // AddCategory page content inside MainLayout
+        },
+        {
+          path: 'edit',  // The :id parameter allows editing specific categories
+          element: <EditInvoice />  // EditCategory page content inside MainLayout
         }
       ]
     }

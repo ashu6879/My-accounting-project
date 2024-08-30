@@ -4,11 +4,12 @@ import project from './project';
 import category from './category';
 import manageClients from './manageClients';
 import manageProject from './manageproject';
+import manageInvoice from './manageInvoice';
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard, project, category, manageClients,manageProject]
+  items: [dashboard, project, category, manageClients,manageProject,manageInvoice]
 };
 
 export default menuItems;
