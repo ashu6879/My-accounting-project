@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
-
 import {
   Button, Container, Typography, Snackbar, Alert,
   IconButton, Table, TableBody, TableCell, TableHead,
-  TableRow, Dialog, DialogActions,TableContainer, DialogContent,
-  DialogTitle, Box, TextField, MenuItem, Drawer, List,
-  ListItem, ListItemText
+  TableRow, Dialog, DialogActions, TableContainer, DialogContent,
+  DialogTitle, Box, TextField, MenuItem
 } from '@mui/material';
 import { Edit, Delete, Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +12,8 @@ import useAuth from 'hooks/useAuth'; // Import the custom hook
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [projectCategories, setProjectCategories] = useState([]);
+  const [clientCategories, setClientCategories] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -29,7 +28,8 @@ const ProjectList = () => {
   const [updateSaledoneBy, setUpdateSaledoneBy] = useState('');
   const [updateApprovedBy, setUpdateApprovedBy] = useState('');
   const [updateCategory, setUpdateCategory] = useState('');
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [updateclientCategory, setUpdateclientCategory] = useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false); // Initialize drawer state
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
 
@@ -37,6 +37,7 @@ const ProjectList = () => {
     if (isAuthenticated) {
       fetchProjects();
       fetchCategories();
+      fetchClientCategories();
     }
   }, [isAuthenticated, page]);
 
@@ -58,14 +59,32 @@ const ProjectList = () => {
     try {
       const response = await fetch('https://ekarigar-accounts.vercel.app/projectcategories');
       if (!response.ok) {
-        throw new Error('Failed to fetch categories');
+        throw new Error('Failed to fetch project categories');
       }
       const data = await response.json();
-      console.log('Fetched categories:', data); // Check the structure here
+      console.log('Fetched project categories:', data);
       if (Array.isArray(data)) {
-        setCategories(data);
+        setProjectCategories(data);
       } else {
-        throw new Error('Categories data is not an array');
+        throw new Error('Project categories data is not an array');
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const fetchClientCategories = async () => {
+    try {
+      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch client categories');
+      }
+      const data = await response.json();
+      console.log('Fetched client categories:', data);
+      if (Array.isArray(data)) {
+        setClientCategories(data);
+      } else {
+        throw new Error('Client categories data is not an array');
       }
     } catch (error) {
       setError(error.message);
@@ -79,6 +98,7 @@ const ProjectList = () => {
     setUpdateSaledoneBy(project.SaledoneBy);
     setUpdateApprovedBy(project.ApprovedBy);
     setUpdateCategory(project.projectCat);
+    setUpdateclientCategory(project.clientCat); // Fixed typo
     setUpdateDialogOpen(true);
   };
 
@@ -129,6 +149,7 @@ const ProjectList = () => {
           SaledoneBy: updateSaledoneBy,
           ApprovedBy: updateApprovedBy,
           projectCat: updateCategory,
+          clientCat: updateclientCategory, // Fixed typo
         }),
       });
 
@@ -138,7 +159,7 @@ const ProjectList = () => {
 
       setSuccess('Project updated successfully');
       setProjects(projects.map((project) =>
-        project._id === projectToUpdate._id ? { ...project, projectTitle: updateName, ServicedBy: updateServicedBy, SaledoneBy: updateSaledoneBy, ApprovedBy: updateApprovedBy, projectCat: updateCategory } : project
+        project._id === projectToUpdate._id ? { ...project, projectTitle: updateName, ServicedBy: updateServicedBy, SaledoneBy: updateSaledoneBy, ApprovedBy: updateApprovedBy, projectCat: updateCategory, clientCat: updateclientCategory } : project
       ));
       handleUpdateDialogClose();
     } catch (error) {
@@ -182,84 +203,84 @@ const ProjectList = () => {
         <MenuIcon />
       </IconButton>
       <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Sr. No.
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Project Name
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Service By
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Sale Done By
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Approved By
-              </Typography>
-            </TableCell>
-            <TableCell align="right">
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Actions
-              </Typography>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {projects.map((project, index) => (
-            <TableRow key={project._id}>
+        <Table>
+          <TableHead>
+            <TableRow>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {index + 1}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Sr. No.
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {project.projectTitle}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Project Name
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {project.ServicedBy}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Service By
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {project.SaledoneBy}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Sale Done By
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {project.ApprovedBy}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Approved By
                 </Typography>
               </TableCell>
               <TableCell align="right">
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <IconButton color="primary" onClick={() => handleEdit(project)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(project)}>
-                    <Delete />
-                  </IconButton>
-                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Actions
+                </Typography>
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      </TableContainer> 
+          </TableHead>
+          <TableBody>
+            {projects.map((project, index) => (
+              <TableRow key={project._id}>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {index + 1}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {project.projectTitle}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {project.ServicedBy}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {project.SaledoneBy}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {project.ApprovedBy}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton color="primary" onClick={() => handleEdit(project)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(project)}>
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {hasMore && (
         <Box textAlign="right" mt={2}>
@@ -271,8 +292,9 @@ const ProjectList = () => {
             sx={{
               transition: 'all 0.3s ease', // Smooth transition for hover effect
               '&:hover': {
-                backgroundColor: '#003d99', // Darker shade on hover
-                color: '#ffffff', // Text color change on hover
+                backgroundColor: '#003d99', // Darker background on hover
+                color: 'white',
+                transform: 'scale(1.05)', // Slightly enlarge button on hover
               },
             }}
           >
@@ -281,101 +303,106 @@ const ProjectList = () => {
         </Box>
       )}
 
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
-        <List>
-          {projects.map((project) => (
-            <ListItem button key={project._id} onClick={() => handleEdit(project)}>
-              <ListItemText primary={project.projectTitle} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-
-      <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
-        <DialogTitle>Update Project</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Project Name"
-            fullWidth
-            value={updateName}
-            onChange={(e) => setUpdateName(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Service By"
-            fullWidth
-            value={updateServicedBy}
-            onChange={(e) => setUpdateServicedBy(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Sale Done By"
-            fullWidth
-            value={updateSaledoneBy}
-            onChange={(e) => setUpdateSaledoneBy(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Approved By"
-            fullWidth
-            value={updateApprovedBy}
-            onChange={(e) => setUpdateApprovedBy(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            select
-            label="Category"
-            fullWidth
-            value={updateCategory}
-            onChange={(e) => setUpdateCategory(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          >
-            {categories.map((cat) => (
-              <MenuItem key={cat._id} value={cat._id}>
-                {cat.categoryName}
-              </MenuItem>
-            ))}
-          </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleUpdateDialogClose}>Cancel</Button>
-          <Button onClick={handleUpdate} variant="contained" color="primary">
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete "{projectToDelete?.projectTitle}" project?</Typography>
-        </DialogContent>
+        <DialogContent>Are you sure you want to delete this "{projectToDelete?.projectTitle}" project?</DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+          <Button onClick={handleDeleteDialogClose} color="primary">
+            Cancel
+          </Button>
           <Button onClick={handleDelete} color="secondary">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={Boolean(success)}
-        autoHideDuration={6000}
-        onClose={() => setSuccess('')}
-      >
-        <Alert onClose={() => setSuccess('')} severity="success">
-          {success}
-        </Alert>
-      </Snackbar>
+      <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
+        <DialogTitle>Update Project</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Project Name"
+            fullWidth
+            value={updateName}
+            onChange={(e) => setUpdateName(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Serviced By"
+            fullWidth
+            value={updateServicedBy}
+            onChange={(e) => setUpdateServicedBy(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Sale Done By"
+            fullWidth
+            value={updateSaledoneBy}
+            onChange={(e) => setUpdateSaledoneBy(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Approved By"
+            fullWidth
+            value={updateApprovedBy}
+            onChange={(e) => setUpdateApprovedBy(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Project Category"
+            select
+            fullWidth
+            value={updateCategory}
+            onChange={(e) => setUpdateCategory(e.target.value)}
+          >
+            {projectCategories.map((category) => (
+              <MenuItem key={category._id} value={category._id}>
+                {category.pcName}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="dense"
+            label="Client Category"
+            select
+            fullWidth
+            value={updateclientCategory}
+            onChange={(e) => setUpdateclientCategory(e.target.value)}
+          >
+            {clientCategories.map((category) => (
+              <MenuItem key={category._id} value={category._id}>
+                {category.ccName}
+              </MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUpdateDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdate} color="secondary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
-        open={Boolean(error)}
+        open={!!error}
         autoHideDuration={6000}
         onClose={() => setError('')}
       >
         <Alert onClose={() => setError('')} severity="error">
           {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess('')}
+      >
+        <Alert onClose={() => setSuccess('')} severity="success">
+          {success}
         </Alert>
       </Snackbar>
     </Container>

@@ -269,7 +269,7 @@ const CategoryList = () => {
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
         <DialogTitle>Delete Client</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this client?
+          Are you sure you want to delete this "{clientToDelete?.clientName}" client?
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteDialogClose}>Cancel</Button>
@@ -319,8 +319,8 @@ const CategoryList = () => {
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {categories.map((category) => (
-              <MenuItem key={category._id} value={category.categoryName}>
-                {category.categoryName}
+              <MenuItem key={category._id} value={category._id}>
+                {category.ccName}
               </MenuItem>
             ))}
           </TextField>
