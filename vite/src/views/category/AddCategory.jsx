@@ -1,29 +1,32 @@
 import React from 'react';
-import { Button, TextField, Container, Typography, Snackbar, Alert } from '@mui/material';
-import useAuth from 'hooks/useAuth'; // Import the custom hook
-import { useNavigate } from 'react-router-dom'; // Add navigation hook
+import { TextField, Container, Typography, Snackbar, Alert } from '@mui/material';
+import LoadingButton from 'ui-component/LoadingButton'; // Import the LoadingButton component
+import useAuth from 'hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const AddCategory = () => {
-  const [ccName, setCcName] = React.useState(''); // Updated state variable
+  const [ccName, setCcName] = React.useState('');
   const [error, setError] = React.useState('');
   const [success, setSuccess] = React.useState('');
-  const { isAuthenticated, loading } = useAuth(); // Use the custom hook
-  const navigate = useNavigate(); // Initialize the navigation hook
+  const [loading, setLoading] = React.useState(false);
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setCcName(e.target.value); // Updated field name
+    setCcName(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
+
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories', { // Updated endpoint
+      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ccName }), // Updated field name
+        body: JSON.stringify({ ccName }),
       });
 
       if (!response.ok) {
@@ -33,23 +36,22 @@ const AddCategory = () => {
 
       setSuccess('Category added successfully!');
       setCcName('');
-
-      // Redirect to the clients list or any other page
       setTimeout(() => {
-        navigate('/category/edit'); // Updated redirect path
+        navigate('/category/edit');
       }, 2000);
-
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false); // Stop loading after the request is complete
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // Show a loading indicator while checking authentication
+  if (authLoading) {
+    return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
-    return null; // Optionally handle redirection or render nothing
+    return null;
   }
 
   return (
@@ -67,14 +69,15 @@ const AddCategory = () => {
           margin="normal"
           required
         />
-        <Button
+        <LoadingButton
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
+          loading={loading}
         >
           Add Category
-        </Button>
+        </LoadingButton>
       </form>
 
       {/* Success Snackbar */}

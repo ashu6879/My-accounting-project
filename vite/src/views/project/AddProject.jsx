@@ -1,13 +1,15 @@
 import React from 'react';
-import { Button, TextField, Container, Typography, Snackbar, Alert } from '@mui/material';
+import { TextField, Container, Typography, Snackbar, Alert } from '@mui/material';
+import LoadingButton from 'ui-component/LoadingButton'; // Import your custom LoadingButton
 import useAuth from 'hooks/useAuth'; // Import the custom hook
 import { useNavigate } from 'react-router-dom'; // Add navigation hook
 
 const AddProject = () => {
   const [category, setCategory] = React.useState('');
+  const [loading, setLoading] = React.useState(false); // State to manage loading
   const [error, setError] = React.useState('');
   const [success, setSuccess] = React.useState('');
-  const { isAuthenticated, loading } = useAuth(); // Use the custom hook
+  const { isAuthenticated, loading: authLoading } = useAuth(); // Use the custom hook
   const navigate = useNavigate(); // Initialize the navigation hook
 
   const handleChange = (e) => {
@@ -16,7 +18,8 @@ const AddProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true); // Start loading
+
     try {
       const response = await fetch('https://ekarigar-accounts.vercel.app/projectcategories', {
         method: 'POST',
@@ -41,10 +44,12 @@ const AddProject = () => {
 
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return <div>Loading...</div>; // Show a loading indicator while checking authentication
   }
 
@@ -67,14 +72,15 @@ const AddProject = () => {
           margin="normal"
           required
         />
-        <Button
+        <LoadingButton
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
+          loading={loading} // Pass loading state to the button
         >
           Add Category
-        </Button>
+        </LoadingButton>
       </form>
 
       {/* Success Snackbar */}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import LoadingButton from 'ui-component/LoadingButton'; // Import the LoadingButton component
 
 const AddProject = () => {
   const [projectData, setProjectData] = useState({
@@ -17,7 +18,8 @@ const AddProject = () => {
   const [categories, setCategories] = useState([]); // State to store fetched categories
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { isAuthenticated, loading } = useAuth();
+  const [loading, setLoading] = useState(false); // Add loading state for form submission
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,7 +58,8 @@ const AddProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true); // Set loading to true when form submission starts
+
     try {
       const response = await fetch('https://ekarigar-accounts.vercel.app/projects', {
         method: 'POST',
@@ -88,10 +91,12 @@ const AddProject = () => {
 
     } catch (error) {
       setError(error.message);
+    } finally {
+      setLoading(false); // Set loading to false when form submission ends
     }
   };
 
-  if (loading) {
+  if (authLoading) {
     return <div>Loading...</div>;
   }
 
@@ -191,14 +196,15 @@ const AddProject = () => {
           </Select>
         </FormControl>
 
-        <Button
+        <LoadingButton
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
+          loading={loading} // Pass loading state to LoadingButton
         >
           Add Project
-        </Button>
+        </LoadingButton>
       </form>
 
       {/* Success Snackbar */}

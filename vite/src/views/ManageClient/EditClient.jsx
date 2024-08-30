@@ -4,7 +4,7 @@ import {
   IconButton, Table, TableBody, TableCell, TableHead,
   TableRow, Dialog, DialogActions, DialogContent,
   DialogTitle, Box, TextField, MenuItem, Drawer, List,
-  ListItem, ListItemText
+  ListItem, ListItemText, TableContainer, Paper
 } from '@mui/material';
 import { Edit, Delete, Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -175,73 +175,75 @@ const CategoryList = () => {
         <MenuIcon />
       </IconButton>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Sr. No.
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Client Name
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Mobile Number
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Email
-              </Typography>
-            </TableCell>
-            <TableCell align="right">
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Actions
-              </Typography>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {clients.map((client, index) => (
-            <TableRow key={client._id}>
+      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+        <Table>
+          <TableHead>
+            <TableRow>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {index + 1}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Sr. No.
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {client.clientName}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Client Name
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {client.clientPhone}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Mobile Number
                 </Typography>
               </TableCell>
               <TableCell>
-                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {client.clientEmail}
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Email
                 </Typography>
               </TableCell>
               <TableCell align="right">
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <IconButton color="primary" onClick={() => handleEdit(client)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(client)}>
-                    <Delete />
-                  </IconButton>
-                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Actions
+                </Typography>
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {clients.map((client, index) => (
+              <TableRow key={client._id}>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {index + 1}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {client.clientName}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {client.clientPhone}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                    {client.clientEmail}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton color="primary" onClick={() => handleEdit(client)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(client)}>
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {hasMore && (
         <Box textAlign="right" mt={2}>
@@ -255,8 +257,7 @@ const CategoryList = () => {
               '&:hover': {
                 backgroundColor: '#003d99', // Darker background on hover
                 color: 'white',
-                transform: 'scale(1.05)', // Slightly enlarge the button
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Add shadow on hover
+                transform: 'scale(1.05)', // Slightly enlarge button on hover
               },
             }}
           >
@@ -265,83 +266,75 @@ const CategoryList = () => {
         </Box>
       )}
 
-      {/* Update Client Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+        <DialogTitle>Delete Client</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this client?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+          <Button onClick={handleDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
         <DialogTitle>Update Client</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
+            label="Client Name"
             fullWidth
+            margin="normal"
             value={updateName}
             onChange={(e) => setUpdateName(e.target.value)}
           />
           <TextField
-            margin="dense"
             label="Address"
             fullWidth
+            margin="normal"
             value={updateAddress}
             onChange={(e) => setUpdateAddress(e.target.value)}
           />
           <TextField
-            margin="dense"
             label="Phone"
             fullWidth
+            margin="normal"
             value={updatePhone}
             onChange={(e) => setUpdatePhone(e.target.value)}
           />
           <TextField
-            margin="dense"
             label="Email"
             fullWidth
+            margin="normal"
             value={updateEmail}
             onChange={(e) => setUpdateEmail(e.target.value)}
           />
           <TextField
             select
-            margin="dense"
             label="Category"
             fullWidth
+            margin="normal"
             value={updateCategory}
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {categories.map((category) => (
-              <MenuItem key={category.ccID} value={category.ccID}>
-                {category.ccName}
+              <MenuItem key={category._id} value={category.categoryName}>
+                {category.categoryName}
               </MenuItem>
             ))}
           </TextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleUpdateDialogClose} color="primary">
-            Cancel
-          </Button>
+          <Button onClick={handleUpdateDialogClose}>Cancel</Button>
           <Button onClick={handleUpdate} color="primary">
             Update
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Delete Client Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-        <DialogTitle>Delete Client</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete "{clientToDelete?.clientName}" client?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDelete} color="primary">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar for error messages */}
       <Snackbar
-        open={Boolean(error)}
+        open={!!error}
         autoHideDuration={6000}
         onClose={() => setError('')}
       >
@@ -349,10 +342,8 @@ const CategoryList = () => {
           {error}
         </Alert>
       </Snackbar>
-
-      {/* Snackbar for success messages */}
       <Snackbar
-        open={Boolean(success)}
+        open={!!success}
         autoHideDuration={6000}
         onClose={() => setSuccess('')}
       >
@@ -360,26 +351,6 @@ const CategoryList = () => {
           {success}
         </Alert>
       </Snackbar>
-
-      {/* Responsive Drawer */}
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={toggleDrawer}
-        sx={{ width: 240, flexShrink: 0, '& .MuiDrawer-paper': { width: 240, boxSizing: 'border-box' } }}
-      >
-        <List>
-          <ListItem button>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-          <ListItem button>
-            <ListItemText primary="Clients" />
-          </ListItem>
-          <ListItem button>
-            <ListItemText primary="Categories" />
-          </ListItem>
-        </List>
-      </Drawer>
     </Container>
   );
 };

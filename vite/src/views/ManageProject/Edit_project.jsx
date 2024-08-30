@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import Paper from '@mui/material/Paper';
+
 import {
   Button, Container, Typography, Snackbar, Alert,
   IconButton, Table, TableBody, TableCell, TableHead,
-  TableRow, Dialog, DialogActions, DialogContent,
+  TableRow, Dialog, DialogActions,TableContainer, DialogContent,
   DialogTitle, Box, TextField, MenuItem, Drawer, List,
   ListItem, ListItemText
 } from '@mui/material';
@@ -179,7 +181,7 @@ const ProjectList = () => {
       >
         <MenuIcon />
       </IconButton>
-
+      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
       <Table>
         <TableHead>
           <TableRow>
@@ -257,6 +259,7 @@ const ProjectList = () => {
           ))}
         </TableBody>
       </Table>
+      </TableContainer> 
 
       {hasMore && (
         <Box textAlign="right" mt={2}>
@@ -294,52 +297,54 @@ const ProjectList = () => {
           <TextField
             label="Project Name"
             fullWidth
-            margin="normal"
             value={updateName}
             onChange={(e) => setUpdateName(e.target.value)}
+            sx={{ marginBottom: 2 }}
           />
           <TextField
             label="Service By"
             fullWidth
-            margin="normal"
             value={updateServicedBy}
             onChange={(e) => setUpdateServicedBy(e.target.value)}
+            sx={{ marginBottom: 2 }}
           />
           <TextField
             label="Sale Done By"
             fullWidth
-            margin="normal"
             value={updateSaledoneBy}
             onChange={(e) => setUpdateSaledoneBy(e.target.value)}
+            sx={{ marginBottom: 2 }}
           />
           <TextField
             label="Approved By"
             fullWidth
-            margin="normal"
             value={updateApprovedBy}
             onChange={(e) => setUpdateApprovedBy(e.target.value)}
+            sx={{ marginBottom: 2 }}
           />
           <TextField
             select
-            label="Project Category"
+            label="Category"
             fullWidth
-            margin="normal"
             value={updateCategory}
             onChange={(e) => setUpdateCategory(e.target.value)}
-            >
-            {(Array.isArray(categories) ? categories : []).map((category) => (
-                <MenuItem key={category._id} value={category._id}>
-                {category.pcName}
-                </MenuItem>
+            sx={{ marginBottom: 2 }}
+          >
+            {categories.map((cat) => (
+              <MenuItem key={cat._id} value={cat._id}>
+                {cat.categoryName}
+              </MenuItem>
             ))}
           </TextField>
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpdateDialogClose}>Cancel</Button>
-          <Button onClick={handleUpdate}>Update</Button>
+          <Button onClick={handleUpdate} variant="contained" color="primary">
+            Update
+          </Button>
         </DialogActions>
       </Dialog>
+
 
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>
