@@ -25,7 +25,7 @@ const AddProject = () => {
     const fetchClientsAndCategories = async () => {
       try {
         // Fetch clients
-        const clientResponse = await fetch('http://localhost:81/clients');
+        const clientResponse = await fetch('https://ekarigar-accounts.vercel.app/clients');
         if (!clientResponse.ok) {
           throw new Error('Failed to fetch clients');
         }
@@ -33,7 +33,7 @@ const AddProject = () => {
         setClients(clientData);
 
         // Fetch categories
-        const categoryResponse = await fetch('http://localhost:81/projectcategories');
+        const categoryResponse = await fetch('https://ekarigar-accounts.vercel.app/projectcategories');
         if (!categoryResponse.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -58,7 +58,7 @@ const AddProject = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:81/projects', {
+      const response = await fetch('https://ekarigar-accounts.vercel.app/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

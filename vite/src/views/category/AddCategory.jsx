@@ -18,7 +18,7 @@ const AddCategory = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:81/clientcategories', { // Updated endpoint
+      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories', { // Updated endpoint
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

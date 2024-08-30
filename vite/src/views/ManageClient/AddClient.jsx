@@ -21,7 +21,7 @@ const AddClient = () => {
     // Fetch client categories on component mount
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:81/clientcategories/all');
+        const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories/all');
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -46,7 +46,7 @@ const AddClient = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:81/clients', {
+      const response = await fetch('https://ekarigar-accounts.vercel.app/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

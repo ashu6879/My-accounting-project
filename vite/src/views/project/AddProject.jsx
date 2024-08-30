@@ -18,7 +18,7 @@ const AddProject = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:81/projectcategories', {
+      const response = await fetch('https://ekarigar-accounts.vercel.app/projectcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
