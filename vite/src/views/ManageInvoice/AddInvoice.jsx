@@ -62,7 +62,7 @@ const GenerateInvoice = () => {
 
       // Fetch projects for the selected client
       try {
-        const response = await fetch(`https://ekarigar-accounts.vercel.app/${clientID}`);
+        const response = await fetch(`https://ekarigar-accounts.vercel.app/getProjectByClientID/${clientID}`);
         const data = await response.json();
         setProjects(data);
       } catch (error) {
