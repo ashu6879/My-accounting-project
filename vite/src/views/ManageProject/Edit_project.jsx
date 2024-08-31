@@ -28,7 +28,7 @@ const ProjectList = () => {
   const [updateSaledoneBy, setUpdateSaledoneBy] = useState('');
   const [updateApprovedBy, setUpdateApprovedBy] = useState('');
   const [updateCategory, setUpdateCategory] = useState('');
-  const [updateclientCategory, setUpdateclientCategory] = useState('');
+  const [updateclients, setUpdateclients] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false); // Initialize drawer state
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
@@ -75,12 +75,12 @@ const ProjectList = () => {
 
   const fetchClientCategories = async () => {
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories');
+      const response = await fetch('https://ekarigar-accounts.vercel.app/clients');
       if (!response.ok) {
-        throw new Error('Failed to fetch client categories');
+        throw new Error('Failed to fetch clients');
       }
       const data = await response.json();
-      console.log('Fetched client categories:', data);
+      console.log('Fetched client', data);
       if (Array.isArray(data)) {
         setClientCategories(data);
       } else {
@@ -98,7 +98,7 @@ const ProjectList = () => {
     setUpdateSaledoneBy(project.SaledoneBy);
     setUpdateApprovedBy(project.ApprovedBy);
     setUpdateCategory(project.projectCat);
-    setUpdateclientCategory(project.clientCat); // Fixed typo
+    setUpdateclients(project.clientCat); // Fixed typo
     setUpdateDialogOpen(true);
   };
 
@@ -149,7 +149,7 @@ const ProjectList = () => {
           SaledoneBy: updateSaledoneBy,
           ApprovedBy: updateApprovedBy,
           projectCat: updateCategory,
-          clientCat: updateclientCategory, // Fixed typo
+          clientCat: updateclients, // Fixed typo
         }),
       });
 
@@ -159,7 +159,7 @@ const ProjectList = () => {
 
       setSuccess('Project updated successfully');
       setProjects(projects.map((project) =>
-        project._id === projectToUpdate._id ? { ...project, projectTitle: updateName, ServicedBy: updateServicedBy, SaledoneBy: updateSaledoneBy, ApprovedBy: updateApprovedBy, projectCat: updateCategory, clientCat: updateclientCategory } : project
+        project._id === projectToUpdate._id ? { ...project, projectTitle: updateName, ServicedBy: updateServicedBy, SaledoneBy: updateSaledoneBy, ApprovedBy: updateApprovedBy, projectCat: updateCategory, clientCat: updateclients } : project
       ));
       handleUpdateDialogClose();
     } catch (error) {
@@ -356,25 +356,25 @@ const ProjectList = () => {
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {projectCategories.map((category) => (
-              <MenuItem key={category.pcName} value={category.pcName}>
+              <MenuItem key={category.pcID} value={category.pcID}>
                 {category.pcName}
               </MenuItem>
             ))}
           </TextField>
           <TextField
-            margin="dense"
-            label="Client Category"
-            select
-            fullWidth
-            value={updateclientCategory}
-            onChange={(e) => setUpdateclientCategory(e.target.value)}
-          >
-            {clientCategories.map((category) => (
-              <MenuItem key={category.ccName} value={category.ccName}>
-                {category.ccName}
-              </MenuItem>
-            ))}
-          </TextField>
+          margin="dense"
+          label="Client"
+          select
+          fullWidth
+          value={updateclients}
+          onChange={(e) => setUpdateclients(e.target.value)}
+        >
+          {clientCategories.map((category) => (
+            <MenuItem key={category.clientID} value={category.clientID}>
+              {category.clientName}
+            </MenuItem>
+          ))}
+        </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpdateDialogClose} color="primary">

@@ -149,7 +149,7 @@ const AddClient = () => {
             label="Client Category"
           >
             {categories.map((category) => (
-              <MenuItem key={category._id} value={category.ccName}>
+              <MenuItem key={category.ccID} value={category.ccID}>
                 {category.ccName}
               </MenuItem>
             ))}

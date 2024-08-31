@@ -23,18 +23,16 @@ const AddProject = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch client data and categories on component mount
     const fetchClientsAndCategories = async () => {
       try {
-        // Fetch clients
         const clientResponse = await fetch('https://ekarigar-accounts.vercel.app/clients');
         if (!clientResponse.ok) {
           throw new Error('Failed to fetch clients');
         }
         const clientData = await clientResponse.json();
+        console.log('Fetched Clients:', clientData); // Add this line to check client data
         setClients(clientData);
-
-        // Fetch categories
+  
         const categoryResponse = await fetch('https://ekarigar-accounts.vercel.app/projectcategories');
         if (!categoryResponse.ok) {
           throw new Error('Failed to fetch categories');
@@ -45,11 +43,13 @@ const AddProject = () => {
         setError(error.message);
       }
     };
-
+  
     fetchClientsAndCategories();
   }, []);
+  
 
   const handleChange = (e) => {
+    console.log('Changing:', e.target.name, e.target.value); // Add this line to check what’s being set
     setProjectData({
       ...projectData,
       [e.target.name]: e.target.value,
@@ -58,8 +58,10 @@ const AddProject = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when form submission starts
-
+    setLoading(true);
+  
+    console.log('Submitting Project Data:', projectData); // Add this line to check data before submission
+  
     try {
       const response = await fetch('https://ekarigar-accounts.vercel.app/projects', {
         method: 'POST',
@@ -68,12 +70,12 @@ const AddProject = () => {
         },
         body: JSON.stringify(projectData),
       });
-
+  
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(errorMessage || 'Failed to add project');
       }
-
+  
       setSuccess('Project added successfully!');
       setProjectData({
         projectTitle: '',
@@ -84,17 +86,18 @@ const AddProject = () => {
         clientID: '',
         projectCat: '',
       });
-
+  
       setTimeout(() => {
         navigate('/ManageProject/edit');
       }, 2000);
-
+  
     } catch (error) {
       setError(error.message);
     } finally {
-      setLoading(false); // Set loading to false when form submission ends
+      setLoading(false);
     }
   };
+  
 
   if (authLoading) {
     return <div>Loading...</div>;
@@ -160,22 +163,23 @@ const AddProject = () => {
 
         {/* Dropdown for selecting a client */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
-          <InputLabel id="client-label">Client</InputLabel>
-          <Select
-            labelId="client-label"
-            id="clientID"
-            name="clientID"
-            value={projectData.clientID}
-            onChange={handleChange}
-            label="Client"
-          >
-            {clients.map((client) => (
-              <MenuItem key={client._id} value={client._id}>
-                {client.clientName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <InputLabel id="client-label">Client</InputLabel>
+        <Select
+          labelId="client-label"
+          id="clientID"
+          name="clientID"
+          value={projectData.clientID}
+          onChange={handleChange}
+          label="Client"
+        >
+          {clients.map((client) => (
+            <MenuItem key={client.clientID} value={client.clientID}>
+              {client.clientName}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
 
         {/* Dropdown for selecting a category */}
         <FormControl variant="outlined" fullWidth margin="normal" required>
@@ -189,7 +193,7 @@ const AddProject = () => {
             label="Project Category"
           >
             {categories.map((category) => (
-              <MenuItem key={category._id} value={category.pcName}>
+              <MenuItem key={category.pcID} value={category.pcID}>
                 {category.pcName}
               </MenuItem>
             ))}

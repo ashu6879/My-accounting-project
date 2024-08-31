@@ -312,14 +312,14 @@ const CategoryList = () => {
           />
           <TextField
             select
-            label="Category"
+            label="Client Category"
             fullWidth
             margin="normal"
             value={updateCategory}
             onChange={(e) => setUpdateCategory(e.target.value)}
           >
             {categories.map((category) => (
-              <MenuItem key={category.ccName} value={category.ccName}>
+              <MenuItem key={category.ccID} value={category.ccID}>
                 {category.ccName}
               </MenuItem>
             ))}
