@@ -6,16 +6,10 @@ exports.addProject = async (req, res) => {
   try {
     const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat, clientID } = req.body;
 
-    // Check if a project with the same title already exists
-    const existingProject = await Client.findOne({ projectTitle });
+    // Check if a project with the same title and clientID already exists
+    const existingProject = await Client.findOne({ projectTitle, clientID });
     if (existingProject) {
-      return res.status(400).send('Project with this title already exists');
-    }
-
-    // Check if a project with the same clientID already exists
-    const existingClientID = await Client.findOne({ clientID });
-    if (existingClientID) {
-      return res.status(400).send('Client with this ID already exists');
+      return res.status(400).send('A project with this title and client ID already exists');
     }
 
     // Get the next projectID from the counter collection
@@ -27,7 +21,7 @@ exports.addProject = async (req, res) => {
 
     const projectID = counter.sequence_value + 1; // Incremented value for new project
 
-    // Create a new client
+    // Create a new project
     const newClient = new Client({
       projectTitle,
       ServicedBy,
@@ -39,16 +33,16 @@ exports.addProject = async (req, res) => {
       clientID // Set the provided clientID
     });
     await newClient.save();
-    res.status(201).send('Client created');
+    res.status(201).send('Project created');
   } catch (err) {
     console.error('Error details:', err); // Log the error details for debugging
 
     if (err.code && err.code === 11000) {
       // Duplicate key error
-      return res.status(400).send('Client with this ID already exists');
+      return res.status(400).send('Duplicate key error');
     }
 
-    res.status(500).send('Error creating client');
+    res.status(500).send('Error creating project');
   }
 };
 
@@ -104,5 +98,20 @@ exports.updateProject = async (req, res) => {
     res.json(updatedClient);
   } catch (err) {
     res.status(500).send('Error updating client');
+  }
+};
+
+exports.getProjectByClientID = async (req, res) => {
+  try {
+    const { clientID } = req.params;
+    const projects = await Client.find({ clientID });
+
+    if (!projects.length) {
+      return res.status(404).send('No projects found for this client ID');
+    }
+
+    res.json(projects);
+  } catch (err) {
+    res.status(500).send('Error fetching projects');
   }
 };

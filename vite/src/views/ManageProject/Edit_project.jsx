@@ -98,7 +98,7 @@ const ProjectList = () => {
     setUpdateSaledoneBy(project.SaledoneBy);
     setUpdateApprovedBy(project.ApprovedBy);
     setUpdateCategory(project.projectCat);
-    setUpdateclients(project.clientCat); // Fixed typo
+    setUpdateclients(project.clientID); // Fixed typo
     setUpdateDialogOpen(true);
   };
 

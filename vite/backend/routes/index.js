@@ -39,5 +39,6 @@ router.get('/projects', projectController.getProject);
 router.get('/projects/count', projectController.getTotalProject);
 router.delete('/projects/:id', projectController.deleteProject);
 router.put('/projects/:id', projectController.updateProject);
+router.get('/getProjectByClientID/:clientID', projectController.getProjectByClientID); // New route
 
 module.exports = router;

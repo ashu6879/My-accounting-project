@@ -1,84 +1,133 @@
-import React, { useEffect, useState } from 'react';
-import { Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl, Grid } from '@mui/material';
+import LoadingButton from 'ui-component/LoadingButton'; // Assuming you have this custom component
 import useAuth from 'hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
-import LoadingButton from 'ui-component/LoadingButton'; // Import the LoadingButton component
 
-const AddClient = () => {
-  const [clientData, setClientData] = useState({
+const GenerateInvoice = () => {
+  const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [invoiceData, setInvoiceData] = useState({
+    clientID: '',
+    projectID: '',
     clientName: '',
     clientAddress: '',
     clientPhone: '',
+    clientCell: '',
+    clientFax: '',
     clientEmail: '',
-    clientCat: '', // Updated from 'category'
+    projectTitle: '',
+    ServicedBy: '',
+    SaledoneBy: '',
+    ApprovedBy: '',
+    ProgressBy: '',
   });
-  const [categories, setCategories] = useState([]); // State to store fetched categories
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state for form submission
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch client categories on component mount
-    const fetchCategories = async () => {
+    // Fetch clients on component mount
+    const fetchClients = async () => {
       try {
-        const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories/all');
-        if (!response.ok) {
-          throw new Error('Failed to fetch categories');
-        }
+        const response = await fetch('https://ekarigar-accounts.vercel.app/clients');
         const data = await response.json();
-        setCategories(data);
+        setClients(data);
       } catch (error) {
-        setError(error.message);
+        setError('Failed to fetch clients');
       }
     };
 
-    fetchCategories();
+    fetchClients();
   }, []);
 
-  const handleChange = (e) => {
-    setClientData({
-      ...clientData,
-      [e.target.name]: e.target.value,
-    });
+  const handleClientChange = async (event) => {
+    const clientID = event.target.value;
+    const client = clients.find(c => c.clientID === clientID);
+
+    if (client) {
+      setSelectedClient(client);
+      setInvoiceData({
+        ...invoiceData,
+        clientID: client.clientID,
+        clientName: client.clientName,
+        clientAddress: client.clientAddress,
+        clientPhone: client.clientPhone,
+        clientCell: client.clientCell,
+        clientFax: client.clientFax,
+        clientEmail: client.clientEmail,
+      });
+
+      // Fetch projects for the selected client
+      try {
+        const response = await fetch(`https://ekarigar-accounts.vercel.app/${clientID}`);
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        setError('Failed to fetch projects for the selected client');
+      }
+    }
+  };
+
+  const handleProjectChange = (event) => {
+    const projectID = event.target.value;
+    const project = projects.find(p => p.projectID === projectID);
+    if (project) {
+      setSelectedProject(project);
+      setInvoiceData({
+        ...invoiceData,
+        projectID: project.projectID,
+        projectTitle: project.projectTitle,
+        ServicedBy: project.ServicedBy,
+        SaledoneBy: project.SaledoneBy,
+        ApprovedBy: project.ApprovedBy,
+        ProgressBy: project.ProgressBy,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when form submission starts
+    setLoading(true);
 
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clients', {
+      // Send invoice data to your backend API
+      const response = await fetch('https://ekarigar-accounts.vercel.app/invoices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(clientData),
+        body: JSON.stringify(invoiceData),
       });
 
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(errorMessage || 'Failed to add client');
+        throw new Error(errorMessage || 'Failed to generate invoice');
       }
 
-      setSuccess('Client added successfully!');
-      setClientData({
+      setSuccess('Invoice generated successfully!');
+      setInvoiceData({
+        clientID: '',
+        projectID: '',
         clientName: '',
         clientAddress: '',
         clientPhone: '',
+        clientCell: '',
+        clientFax: '',
         clientEmail: '',
-        clientCat: '', // Updated from 'category'
+        projectTitle: '',
+        ServicedBy: '',
+        SaledoneBy: '',
+        ApprovedBy: '',
+        ProgressBy: '',
       });
-
-      setTimeout(() => {
-        navigate('/ManageClient/edit');
-      }, 2000);
-
+      setProjects([]);
     } catch (error) {
       setError(error.message);
     } finally {
-      setLoading(false); // Set loading to false when form submission ends
+      setLoading(false);
     }
   };
 
@@ -91,80 +140,175 @@ const AddClient = () => {
   }
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
-        Add Client
+        Generate Invoice
       </Typography>
       <form onSubmit={handleSubmit}>
-        <TextField
-          label="Name"
-          name="clientName"
-          variant="outlined"
-          fullWidth
-          value={clientData.clientName}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Address"
-          name="clientAddress"
-          variant="outlined"
-          fullWidth
-          value={clientData.clientAddress}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Phone"
-          name="clientPhone"
-          variant="outlined"
-          fullWidth
-          value={clientData.clientPhone}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Email"
-          name="clientEmail"
-          variant="outlined"
-          fullWidth
-          value={clientData.clientEmail}
-          onChange={handleChange}
-          margin="normal"
-          required
-        />
+        <Grid container spacing={3}>
+          {/* Client Selection */}
+          <Grid item xs={12} sm={6}>
+            <FormControl variant="outlined" fullWidth required>
+              <InputLabel id="client-label">Select Client</InputLabel>
+              <Select
+                labelId="client-label"
+                id="clientID"
+                name="clientID"
+                value={invoiceData.clientID}
+                onChange={handleClientChange}
+                label="Select Client"
+              >
+                {clients.map(client => (
+                  <MenuItem key={client.clientID} value={client.clientID}>
+                    {client.clientName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-        {/* Dropdown for selecting a category */}
-        <FormControl variant="outlined" fullWidth margin="normal" required>
-          <InputLabel id="category-label">Client Category</InputLabel>
-          <Select
-            labelId="category-label"
-            id="clientCat"
-            name="clientCat" // Updated from 'category'
-            value={clientData.clientCat}
-            onChange={handleChange}
-            label="Client Category"
-          >
-            {categories.map((category) => (
-              <MenuItem key={category._id} value={category.ccName}>
-                {category.ccName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          {/* Project Selection */}
+          <Grid item xs={12} sm={6}>
+            <FormControl variant="outlined" fullWidth required>
+              <InputLabel id="project-label">Select Project</InputLabel>
+              <Select
+                labelId="project-label"
+                id="projectID"
+                name="projectID"
+                value={invoiceData.projectID}
+                onChange={handleProjectChange}
+                label="Select Project"
+                disabled={!selectedClient}
+              >
+                {projects.map(project => (
+                  <MenuItem key={project.projectID} value={project.projectID}>
+                    {project.projectTitle}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-        <LoadingButton
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          loading={loading} // Pass loading state to LoadingButton
-        >
-          Add Client
-        </LoadingButton>
+          {/* Client Information (Auto-filled) */}
+          <Grid item xs={12}>
+            <TextField
+              label="Client Name"
+              name="clientName"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientName}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Client Address"
+              name="clientAddress"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientAddress}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Client Phone"
+              name="clientPhone"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientPhone}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Client Cell"
+              name="clientCell"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientCell}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Client Fax"
+              name="clientFax"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientFax}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Client Email"
+              name="clientEmail"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.clientEmail}
+              disabled
+              margin="normal"
+            />
+          </Grid>
+
+          {/* Project Information (Auto-filled) */}
+          <Grid item xs={12}>
+            <TextField
+              label="Project Title"
+              name="projectTitle"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.projectTitle}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Serviced By"
+              name="ServicedBy"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.ServicedBy}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Sale Done By"
+              name="SaledoneBy"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.SaledoneBy}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Approved By"
+              name="ApprovedBy"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.ApprovedBy}
+              disabled
+              margin="normal"
+            />
+            <TextField
+              label="Progress By"
+              name="ProgressBy"
+              variant="outlined"
+              fullWidth
+              value={invoiceData.ProgressBy}
+              disabled
+              margin="normal"
+            />
+          </Grid>
+
+          {/* Submit Button */}
+          <Grid item xs={12}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              loading={loading}
+            >
+              Generate Invoice
+            </LoadingButton>
+          </Grid>
+        </Grid>
       </form>
 
       {/* Success Snackbar */}
@@ -188,4 +332,4 @@ const AddClient = () => {
   );
 };
 
-export default AddClient;
+export default GenerateInvoice;
