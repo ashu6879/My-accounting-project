@@ -1,4 +1,5 @@
 const ClientCategory = require('../models/clientCategory');
+const Counter = require('../models/counter');
 
 // Add a new client category
 exports.addClientCategory = async (req, res) => {
@@ -9,8 +10,18 @@ exports.addClientCategory = async (req, res) => {
     const existingCategory = await ClientCategory.findOne({ ccName });
     if (existingCategory) return res.status(400).send('Client category already exists');
 
-    // Create a new client category
-    const newCategory = new ClientCategory({ ccName });
+    // Get the next ccID from the counter collection
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'clientCategory' },
+      { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true }
+    );
+
+    // Create a new client category with the incremented ccID
+    const newCategory = new ClientCategory({
+      ccID: counter.sequence_value,
+      ccName,
+    });
     await newCategory.save();
     res.status(201).send('Client category created');
   } catch (err) {

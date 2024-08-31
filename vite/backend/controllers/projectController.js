@@ -1,9 +1,10 @@
 const Client = require('../models/project');
+const Counter = require('../models/counter');
 
 // Add a new client
 exports.addProject = async (req, res) => {
   try {
-    const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat } = req.body;
+    const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat } = req.body;
 
     // Check if a project with the same title already exists
     const existingProject = await Client.findOne({ projectTitle });
@@ -11,14 +12,25 @@ exports.addProject = async (req, res) => {
       return res.status(400).send('Project with this title already exists');
     }
 
-    // Check if the client already exists based on clientID
-    const existingClient = await Client.findOne({ clientID });
-    if (existingClient) {
-      return res.status(400).send('Client with this ID already exists');
-    }
+    // Get the next projectID from the counter collection
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'projectID' },
+      { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const projectID = counter.sequence_value + 1; // Incremented value for new project
 
     // Create a new client
-    const newClient = new Client({ projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat });
+    const newClient = new Client({
+      projectTitle,
+      ServicedBy,
+      SaledoneBy,
+      ApprovedBy,
+      ProgressBy,
+      projectID, // Set the auto-incremented projectID
+      projectCat
+    });
     await newClient.save();
     res.status(201).send('Client created');
   } catch (err) {
@@ -32,7 +44,6 @@ exports.addProject = async (req, res) => {
     res.status(500).send('Error creating client');
   }
 };
-
 
 // Get a list of clients
 exports.getProject = async (req, res) => {
@@ -74,12 +85,12 @@ exports.deleteProject = async (req, res) => {
 exports.updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat } = req.body;
+    const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat } = req.body;
 
     // Update the client
     const updatedClient = await Client.findByIdAndUpdate(
       id,
-      { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, clientID, projectCat },
+      { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat },
       { new: true }
     );
     if (!updatedClient) return res.status(404).send('Client not found');

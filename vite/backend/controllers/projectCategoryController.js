@@ -1,13 +1,28 @@
 const ProjectCategory = require('../models/projectCategory');
+const Counter = require('../models/counter');
 
 // Add Project Category
 exports.addProjectCategory = async (req, res) => {
   try {
     const { pcName } = req.body;
+
+    // Check if the category already exists
     const existingCategory = await ProjectCategory.findOne({ pcName });
     if (existingCategory) return res.status(400).send('Project category already exists');
 
-    const newCategory = new ProjectCategory({ pcName });
+    // Get the next pcID from the projectCategory counter
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'projectCategory' },
+      { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true }
+    );
+
+    // Create a new project category with the incremented pcID
+    const newCategory = new ProjectCategory({
+      pcID: counter.sequence_value,
+      pcName,
+    });
+
     await newCategory.save();
     res.status(201).send('Project category created');
   } catch (err) {

@@ -1,4 +1,20 @@
 const Client = require('../models/client');
+const Counter = require('../models/counter'); // Import the Counter model
+
+// Function to get the next sequence value for a counter
+const getNextSequenceValue = async (counterName) => {
+  try {
+    const counter = await Counter.findByIdAndUpdate(
+      counterName,
+      { $inc: { sequence_value: 1 } },
+      { new: true, upsert: true }
+    );
+    return counter.sequence_value;
+  } catch (err) {
+    console.error('Error getting next sequence value:', err);
+    throw new Error('Error generating clientID');
+  }
+};
 
 // Add a new client
 exports.addClient = async (req, res) => {
@@ -9,8 +25,11 @@ exports.addClient = async (req, res) => {
     const existingClient = await Client.findOne({ clientEmail });
     if (existingClient) return res.status(400).send('Client with this email already exists');
 
+    // Get the next clientID
+    const clientID = await getNextSequenceValue('clientID');
+
     // Create a new client
-    const newClient = new Client({ clientName, clientEmail, clientPhone, clientAddress, clientCat });
+    const newClient = new Client({ clientID, clientName, clientEmail, clientPhone, clientAddress, clientCat });
     await newClient.save();
     res.status(201).send('Client created');
   } catch (err) {
@@ -24,7 +43,6 @@ exports.addClient = async (req, res) => {
     res.status(500).send('Error creating client');
   }
 };
-
 
 // Get a list of clients
 exports.getClients = async (req, res) => {
@@ -66,12 +84,12 @@ exports.deleteClient = async (req, res) => {
 exports.updateClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, address } = req.body;
+    const { clientName, clientEmail, clientPhone, clientAddress, clientCat } = req.body;
 
     // Update the client
     const updatedClient = await Client.findByIdAndUpdate(
       id,
-      { name, email, phone, address },
+      { clientName, clientEmail, clientPhone, clientAddress, clientCat },
       { new: true }
     );
     if (!updatedClient) return res.status(404).send('Client not found');

@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const clientCategorySchema = new mongoose.Schema({
-  ccName: { // Changed from 'name' to 'ccName'
+  ccID: {
+    type: Number,
+    unique: true,
+    required: true,
+  },
+  ccName: {
     type: String,
     required: true,
     unique: true,
