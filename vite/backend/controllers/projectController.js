@@ -1,3 +1,6 @@
+const Client = require('../models/project');
+const Counter = require('../models/counter'); // Import the Counter model
+
 // Add a new client
 exports.addProject = async (req, res) => {
   try {
