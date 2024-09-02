@@ -7,7 +7,7 @@ const clientSchema = new mongoose.Schema({
   SaledoneBy: { type: String },
   ApprovedBy: { type: String },
   ProgressBy: { type: String },
-  clientID:   { type: String },
+  clientID:   { type: Number },
   projectCat: { type: String },
 });
 const Client = mongoose.model('projects', clientSchema);
