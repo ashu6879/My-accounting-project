@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const clientSchema = new mongoose.Schema({
-  projectID: {type: Number,required: true,unique: true},
+  projectID: {type: String,required: true,unique: true},
   projectTitle: { type: String, required: true },
   ServicedBy: { type: String, required: true },
   SaledoneBy: { type: String },

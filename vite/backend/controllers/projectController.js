@@ -1,7 +1,7 @@
 const Client = require('../models/project');
-const Counter = require('../models/counter'); // Import the Counter model
+const Counter = require('../models/counter');
 
-// Add a new client
+// Add a new project
 exports.addProject = async (req, res) => {
   try {
     const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat, clientID } = req.body;
@@ -19,7 +19,7 @@ exports.addProject = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const projectID = counter.sequence_value + 1; // Incremented value for new project
+    const projectID = counter.sequence_value; // Use the incremented value for new project
 
     // Create a new project
     const newClient = new Client({
@@ -30,23 +30,18 @@ exports.addProject = async (req, res) => {
       ProgressBy,
       projectID, // Set the auto-incremented projectID
       projectCat,
-      clientID // Set the provided clientID
+      clientID: String(clientID) // Ensure clientID is consistent
     });
+
     await newClient.save();
     res.status(201).send('Project created');
   } catch (err) {
-    console.error('Error details:', err); // Log the error details for debugging
-
-    if (err.code && err.code === 11000) {
-      // Duplicate key error
-      return res.status(400).send('Duplicate key error');
-    }
-
+    console.error('Error details:', err);
     res.status(500).send('Error creating project');
   }
 };
 
-// Get a list of clients
+// Get a list of projects
 exports.getProject = async (req, res) => {
   try {
     const { page = 1, limit = 1000 } = req.query;
@@ -60,7 +55,7 @@ exports.getProject = async (req, res) => {
   }
 };
 
-// Get total count of clients
+// Get total count of projects
 exports.getTotalProject = async (req, res) => {
   try {
     const count = await Client.countDocuments();
@@ -70,41 +65,42 @@ exports.getTotalProject = async (req, res) => {
   }
 };
 
-// Delete a client by ID
+// Delete a project by ID
 exports.deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
     const result = await Client.findByIdAndDelete(id);
-    if (!result) return res.status(404).send('Client not found');
-    res.send('Client deleted');
+    if (!result) return res.status(404).send('Project not found');
+    res.send('Project deleted');
   } catch (err) {
-    res.status(500).send('Error deleting client');
+    res.status(500).send('Error deleting project');
   }
 };
 
-// Update a client by ID
+// Update a project by ID
 exports.updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat, clientID } = req.body;
 
-    // Update the client
+    // Update the project
     const updatedClient = await Client.findByIdAndUpdate(
       id,
-      { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat, clientID },
+      { projectTitle, ServicedBy, SaledoneBy, ApprovedBy, ProgressBy, projectCat, clientID: String(clientID) },
       { new: true }
     );
-    if (!updatedClient) return res.status(404).send('Client not found');
+    if (!updatedClient) return res.status(404).send('Project not found');
     res.json(updatedClient);
   } catch (err) {
-    res.status(500).send('Error updating client');
+    res.status(500).send('Error updating project');
   }
 };
 
+// Get projects by clientID
 exports.getProjectByClientID = async (req, res) => {
   try {
     const { clientID } = req.params;
-    const projects = await Client.find({ clientID });
+    const projects = await Client.find({ clientID: Number(clientID) });
 
     if (!projects.length) {
       return res.status(404).send('No projects found for this client ID');
@@ -112,6 +108,7 @@ exports.getProjectByClientID = async (req, res) => {
 
     res.json(projects);
   } catch (err) {
+    console.error('Error fetching projects:', err); // Improved logging
     res.status(500).send('Error fetching projects');
   }
 };
