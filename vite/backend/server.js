@@ -49,7 +49,7 @@ connectDB().then(async () => {
 
 // Configure CORS
 const corsOptions = {
-  origin: '*', // Adjust this as needed for security
+  origin: 'https://admin-ekarigar.vercel.app/', // Adjust this as needed for security
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
