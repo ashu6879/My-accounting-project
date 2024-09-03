@@ -35,10 +35,10 @@ exports.addInvoiceItem = async (req, res) => {
   }
 };
 
-// Get all invoice items
 exports.getInvoiceItems = async (req, res) => {
   try {
-    const items = await InvoiceItem.find();
+    const items = await InvoiceItem.find()
+      .sort({ createdAt: -1 }); // Removed the semicolon here
     res.status(200).json(items);
   } catch (error) {
     console.error('Error fetching invoice items:', error);

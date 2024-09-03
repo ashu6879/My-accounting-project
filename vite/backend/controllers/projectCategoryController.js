@@ -35,7 +35,13 @@ exports.getProjectCategories = async (req, res) => {
   try {
     const { page = 1, limit = 3000 } = req.query;
     const skip = (page - 1) * limit;
-    const categories = await ProjectCategory.find().skip(parseInt(skip)).limit(parseInt(limit));
+
+    // Fetch categories, sorting by the newest first
+    const categories = await ProjectCategory.find()
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
     res.json(categories);
   } catch (error) {
     console.error(error);
