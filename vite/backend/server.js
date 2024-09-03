@@ -49,7 +49,7 @@ connectDB().then(async () => {
 
 // Configure CORS
 const corsOptions = {
-  origin: 'https://ekarigar-accounts.vercel.app/', // Adjust this as needed for security
+  origin: '*', // Adjust this as needed for security
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -71,3 +71,5 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
+
+module.exports = app;
