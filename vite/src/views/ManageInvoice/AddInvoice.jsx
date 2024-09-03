@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Button,TextField,Container,Typography,Snackbar,Alert,MenuItem,Select,InputLabel, FormControl,Grid,
+  Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl, Grid, Box
 } from '@mui/material';
 import LoadingButton from 'ui-component/LoadingButton'; // Assuming you have this custom component
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
 import useAuth from 'hooks/useAuth';
 
 const GenerateInvoice = () => {
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [invoiceItems, setInvoiceItems] = useState([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [invoiceData, setInvoiceData] = useState({
     clientID: '',
     projectID: '',
-    clientName: '',
-    clientAddress: '',
-    clientPhone: '',
-    clientEmail: '',
-    projectTitle: '',
-    ServicedBy: '',
-    SaledoneBy: '',
-    ApprovedBy: '',
-    ProgressBy: '',
+    remarks: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,14 +42,10 @@ const GenerateInvoice = () => {
 
     if (client) {
       setSelectedClient(client);
-      setInvoiceData({
-        ...invoiceData,
+      setInvoiceData(prevData => ({
+        ...prevData,
         clientID: client.clientID,
-        clientName: client.clientName,
-        clientAddress: client.clientAddress,
-        clientPhone: client.clientPhone,
-        clientEmail: client.clientEmail,
-      });
+      }));
 
       try {
         const response = await fetch(`https://ekarigar-accounts.vercel.app/getProjectByClientID/${clientID}`);
@@ -72,21 +62,48 @@ const GenerateInvoice = () => {
     const project = projects.find(p => p.projectID === projectID);
     if (project) {
       setSelectedProject(project);
-      setInvoiceData({
-        ...invoiceData,
+      setInvoiceData(prevData => ({
+        ...prevData,
         projectID: project.projectID,
-        projectTitle: project.projectTitle,
-        ServicedBy: project.ServicedBy,
-        SaledoneBy: project.SaledoneBy,
-        ApprovedBy: project.ApprovedBy,
-        ProgressBy: project.ProgressBy,
-      });
+      }));
     }
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setInvoiceData(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleItemChange = (index, event) => {
+    const { name, value } = event.target;
+    const newItems = [...invoiceItems];
+    newItems[index] = { ...newItems[index], [name]: value };
+    setInvoiceItems(newItems);
+  };
+
+  const addItem = () => {
+    setInvoiceItems(prevItems => [
+      ...prevItems,
+      { invID: prevItems.length + 1, itemDesc: '', itemQty: 0, itemRate: 0 }
+    ]);
+  };
+
+  const removeItem = (index) => {
+    setInvoiceItems(prevItems => prevItems.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const postData = {
+      clientID: invoiceData.clientID,
+      projectID: invoiceData.projectID,
+      remarks: invoiceData.remarks,
+    };
 
     try {
       const response = await fetch('https://ekarigar-accounts.vercel.app/invoices', {
@@ -94,7 +111,7 @@ const GenerateInvoice = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(invoiceData),
+        body: JSON.stringify(postData),
       });
 
       if (!response.ok) {
@@ -102,21 +119,35 @@ const GenerateInvoice = () => {
         throw new Error(errorMessage || 'Failed to generate invoice');
       }
 
+      // Send invoice items
+      await Promise.all(invoiceItems.map(async (item) => {
+        const itemResponse = await fetch('https://ekarigar-accounts.vercel.app/invoiceItem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...item,
+            invID: postData.clientID, // You may need to adjust this if `invID` needs to be set differently
+          }),
+        });
+
+        if (!itemResponse.ok) {
+          const errorMessage = await itemResponse.text();
+          throw new Error(errorMessage || 'Failed to add invoice item');
+        }
+      }));
+
       setSuccess('Invoice generated successfully!');
       setInvoiceData({
         clientID: '',
         projectID: '',
-        clientName: '',
-        clientAddress: '',
-        clientPhone: '',
-        clientEmail: '',
-        projectTitle: '',
-        ServicedBy: '',
-        SaledoneBy: '',
-        ApprovedBy: '',
-        ProgressBy: '',
+        remarks: '',
       });
+      setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
       setProjects([]);
+      setSelectedClient(null);
+      setSelectedProject(null);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -139,10 +170,9 @@ const GenerateInvoice = () => {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
-          {/* Row with Two Columns */}
+          {/* Client and Project Selection */}
           <Grid item xs={12}>
             <Grid container spacing={3}>
-              {/* Client Selection Column */}
               <Grid item xs={12} sm={6}>
                 <FormControl variant="outlined" fullWidth required>
                   <InputLabel id="client-label">Select Client</InputLabel>
@@ -162,8 +192,6 @@ const GenerateInvoice = () => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Project Selection Column */}
               <Grid item xs={12} sm={6}>
                 <FormControl variant="outlined" fullWidth required>
                   <InputLabel id="project-label">Select Project</InputLabel>
@@ -187,139 +215,128 @@ const GenerateInvoice = () => {
             </Grid>
           </Grid>
 
-          {/* Client Information */}
+          {/* Client and Project Details */}
+          {selectedClient && (
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Client Details
+              </Typography>
+              <Box mb={2}>
+                <Typography variant="subtitle1">
+                  Client Name: {selectedClient.clientName}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Client Email: {selectedClient.clientEmail}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Client Address: {selectedClient.clientAddress}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+          {selectedProject && (
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Project Details
+              </Typography>
+              <Box mb={2}>
+                <Typography variant="subtitle1">
+                  Project Title: {selectedProject.projectTitle}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Serviced By: {selectedProject.ServicedBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Sale done By: {selectedProject.SaledoneBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Approved By: {selectedProject.ApprovedBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Progress By: {selectedProject.ProgressBy}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+          {/* Invoice Items */}
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom>
-              Client Information
+              Invoice Items
             </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Client Name"
-                  name="clientName"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.clientName}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Client Address"
-                  name="clientAddress"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.clientAddress}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Client Phone"
-                  name="clientPhone"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.clientPhone}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Client Email"
-                  name="clientEmail"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.clientEmail}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-            </Grid>
+            <Button variant="outlined" color="primary" onClick={addItem}>
+              Add Item
+            </Button>
+            {invoiceItems.map((item, index) => (
+              <Box key={index} mt={2}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      label="Description"
+                      name="itemDesc"
+                      variant="outlined"
+                      fullWidth
+                      value={item.itemDesc}
+                      onChange={(event) => handleItemChange(index, event)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <TextField
+                      type="number"
+                      label="Quantity"
+                      name="itemQty"
+                      variant="outlined"
+                      fullWidth
+                      value={item.itemQty}
+                      onChange={(event) => handleItemChange(index, event)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <TextField
+                      type="number"
+                      label="Rate"
+                      name="itemRate"
+                      variant="outlined"
+                      fullWidth
+                      value={item.itemRate}
+                      onChange={(event) => handleItemChange(index, event)}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={1}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => removeItem(index)}
+                      startIcon={<DeleteIcon />}
+                    >
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
           </Grid>
 
-          {/* Project Information */}
+          {/* Remarks */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Project Information
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Project Title"
-                  name="projectTitle"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.projectTitle}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Serviced By"
-                  name="ServicedBy"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.ServicedBy}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Saledone By"
-                  name="SaledoneBy"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.SaledoneBy}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Approved By"
-                  name="ApprovedBy"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.ApprovedBy}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Progress By"
-                  name="ProgressBy"
-                  variant="outlined"
-                  fullWidth
-                  value={invoiceData.ProgressBy}
-                  disabled
-                  margin="normal"
-
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              label="Remarks"
+              name="remarks"
+              variant="outlined"
+              fullWidth
+              multiline
+              rows={4}
+              value={invoiceData.remarks}
+              onChange={handleChange}
+            />
           </Grid>
 
           {/* Submit Button */}
           <Grid item xs={12}>
             <LoadingButton
-              type="submit"
+              loading={loading}
               variant="contained"
               color="primary"
-              loading={loading}
+              type="submit"
+              fullWidth
             >
               Generate Invoice
             </LoadingButton>
@@ -327,17 +344,21 @@ const GenerateInvoice = () => {
         </Grid>
       </form>
 
-      {/* Success or Error Message */}
-      <Snackbar open={!!success} autoHideDuration={60000} onClose={() => setSuccess('')}>
-        <Alert onClose={() => setSuccess('')} severity="success">
-          {success}
-        </Alert>
-      </Snackbar>
-      <Snackbar open={!!error} autoHideDuration={60000} onClose={() => setError('')}>
-        <Alert onClose={() => setError('')} severity="error">
-          {error}
-        </Alert>
-      </Snackbar>
+      {/* Success/Error Messages */}
+      {success && (
+        <Snackbar open autoHideDuration={6000} onClose={() => setSuccess('')}>
+          <Alert onClose={() => setSuccess('')} severity="success">
+            {success}
+          </Alert>
+        </Snackbar>
+      )}
+      {error && (
+        <Snackbar open autoHideDuration={6000} onClose={() => setError('')}>
+          <Alert onClose={() => setError('')} severity="error">
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
     </Container>
   );
 };

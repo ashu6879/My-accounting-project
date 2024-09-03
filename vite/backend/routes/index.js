@@ -4,6 +4,8 @@ const projectCategoryController = require('../controllers/projectCategoryControl
 const clientCategoryController = require('../controllers/clientCategoryController');
 const clientController = require('../controllers/clientController'); // Import the client controller
 const projectController = require('../controllers/projectController');
+const invoiceController = require('../controllers/invoiceController');
+const invoiceItemController = require('../controllers/invoiceItemController');
 
 const router = express.Router();
 
@@ -40,5 +42,19 @@ router.get('/projects/count', projectController.getTotalProject);
 router.delete('/projects/:id', projectController.deleteProject);
 router.put('/projects/:id', projectController.updateProject);
 router.get('/getProjectByClientID/:clientID', projectController.getProjectByClientID); // New route
+
+// Add a new invoice
+router.post('/invoices', invoiceController.addInvoice);
+router.get('/invoices', invoiceController.getInvoices);
+router.get('/invoices/count', invoiceController.getTotalInvoices);
+router.delete('/invoices/:id', invoiceController.deleteInvoice);
+router.put('/invoices/:id', invoiceController.updateInvoice);
+
+// Route to create a new invoice item
+router.post('/invoiceItem', invoiceItemController.addInvoiceItem);
+router.get('/invoiceItem', invoiceItemController.getInvoiceItems);
+router.get('/invoiceItem/:id', invoiceItemController.getInvoiceItemById);
+router.put('/invoiceItem/:id', invoiceItemController.updateInvoiceItem);
+router.delete('/invoiceItem/:id', invoiceItemController.deleteInvoiceItem);
 
 module.exports = router;

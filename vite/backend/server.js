@@ -15,8 +15,11 @@ const initializeCounters = async () => {
     const counters = [
       { _id: 'clientCategory', initial_value: 77 },
       { _id: 'projectCategory', initial_value: 74 },
-      { _id: 'projectID', initial_value: 134 },  // Added for projectID initialization
-      { _id: 'clientID', initial_value: 118 },  // Added for projectID initialization
+      { _id: 'projectID', initial_value: 134 },
+      { _id: 'clientID', initial_value: 118 },
+      { _id: 'invID', initial_value: 288 },  // Added for invID initialization
+      { _id: 'invNum', initial_value: 12312300194 },  // Added for invNum initialization
+      { _id: 'invtID', initial_value: 1065 }  // Added for invtID initialization
     ];
 
     // Loop through each counter definition
@@ -24,7 +27,7 @@ const initializeCounters = async () => {
       const counter = await Counter.findById(_id);
       if (!counter) {
         await Counter.create({ _id, sequence_value: initial_value });
-        console.log(`Counter for ${_id} initialized to start from ${initial_value + 1}.`);
+        console.log(`Counter for ${_id} initialized to start from ${initial_value}.`);
       } else {
         console.log(`Counter for ${_id} already initialized.`);
       }
