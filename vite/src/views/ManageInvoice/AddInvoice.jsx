@@ -9,7 +9,7 @@ import useAuth from 'hooks/useAuth';
 const GenerateInvoice = () => {
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [invoiceItems, setInvoiceItems] = useState([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
+  const [invoiceItems, setInvoiceItems] = useState([{ itemDesc: '', itemQty: 0, itemRate: 0 }]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [invoiceData, setInvoiceData] = useState({
@@ -87,7 +87,7 @@ const GenerateInvoice = () => {
   const addItem = () => {
     setInvoiceItems(prevItems => [
       ...prevItems,
-      { invID: prevItems.length + 1, itemDesc: '', itemQty: 0, itemRate: 0 }
+      { itemDesc: '', itemQty: 0, itemRate: 0 }
     ]);
   };
 
@@ -128,7 +128,7 @@ const GenerateInvoice = () => {
           },
           body: JSON.stringify({
             ...item,
-            invID: postData.clientID, // You may need to adjust this if `invID` needs to be set differently
+            // Remove invID from the request payload
           }),
         });
 
@@ -144,7 +144,7 @@ const GenerateInvoice = () => {
         projectID: '',
         remarks: '',
       });
-      setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
+      setInvoiceItems([{ itemDesc: '', itemQty: 0, itemRate: 0 }]);
       setProjects([]);
       setSelectedClient(null);
       setSelectedProject(null);
@@ -290,7 +290,7 @@ const GenerateInvoice = () => {
                       onChange={(event) => handleItemChange(index, event)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={4}>
                     <TextField
                       type="number"
                       label="Rate"
@@ -301,21 +301,21 @@ const GenerateInvoice = () => {
                       onChange={(event) => handleItemChange(index, event)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={1}>
+                  <Grid item xs={12} sm={12} mt={1}>
                     <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => removeItem(index)}
+                      variant="contained"
+                      color="error"
                       startIcon={<DeleteIcon />}
+                      onClick={() => removeItem(index)}
                     >
+                      Remove
                     </Button>
                   </Grid>
                 </Grid>
               </Box>
             ))}
           </Grid>
-
-          {/* Remarks */}
+          {/* Remarks and Submit Button */}
           <Grid item xs={12}>
             <TextField
               label="Remarks"
@@ -328,37 +328,28 @@ const GenerateInvoice = () => {
               onChange={handleChange}
             />
           </Grid>
-
-          {/* Submit Button */}
           <Grid item xs={12}>
             <LoadingButton
+              type="submit"
               loading={loading}
               variant="contained"
               color="primary"
-              type="submit"
-              fullWidth
             >
               Generate Invoice
             </LoadingButton>
           </Grid>
         </Grid>
       </form>
-
-      {/* Success/Error Messages */}
-      {success && (
-        <Snackbar open autoHideDuration={6000} onClose={() => setSuccess('')}>
-          <Alert onClose={() => setSuccess('')} severity="success">
-            {success}
-          </Alert>
-        </Snackbar>
-      )}
-      {error && (
-        <Snackbar open autoHideDuration={6000} onClose={() => setError('')}>
-          <Alert onClose={() => setError('')} severity="error">
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')}>
+        <Alert onClose={() => setError('')} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={!!success} autoHideDuration={6000} onClose={() => setSuccess('')}>
+        <Alert onClose={() => setSuccess('')} severity="success">
+          {success}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

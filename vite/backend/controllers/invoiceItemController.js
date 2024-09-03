@@ -14,10 +14,11 @@ const getNextSequenceValue = async (sequenceName) => {
 // Add a new invoice item
 exports.addInvoiceItem = async (req, res) => {
   try {
-    const { invID, itemDesc, itemQty, itemRate } = req.body;
+    const { itemDesc, itemQty, itemRate } = req.body;
 
     // Get the next invtID from the counter collection
     const invtID = await getNextSequenceValue('invtID');
+    const invID = await getNextSequenceValue('invID');
 
     const newItem = new InvoiceItem({
       invID,
