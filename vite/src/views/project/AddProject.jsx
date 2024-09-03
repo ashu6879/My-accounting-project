@@ -21,7 +21,7 @@ const AddProject = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/projectcategories', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/projectcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

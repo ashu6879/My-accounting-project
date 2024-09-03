@@ -23,7 +23,7 @@ const AddClient = () => {
     // Fetch client categories on component mount
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories/all');
+        const response = await fetch('https://ekarigar-accounts.onrender.com/clientcategories/all');
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -49,7 +49,7 @@ const AddClient = () => {
     setLoading(true); // Set loading to true when form submission starts
 
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clients', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

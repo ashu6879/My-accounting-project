@@ -43,7 +43,7 @@ const ProjectList = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/projects?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects?page=${page}&limit=${limit}`);
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
@@ -57,7 +57,7 @@ const ProjectList = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/projectcategories');
+      const response = await fetch('https://ekarigar-accounts.onrender.com/projectcategories');
       if (!response.ok) {
         throw new Error('Failed to fetch project categories');
       }
@@ -75,7 +75,7 @@ const ProjectList = () => {
 
   const fetchClientCategories = async () => {
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clients');
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clients');
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -119,7 +119,7 @@ const ProjectList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/projects/${projectToDelete._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects/${projectToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -138,7 +138,7 @@ const ProjectList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/projects/${projectToUpdate._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects/${projectToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

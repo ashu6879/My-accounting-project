@@ -25,7 +25,7 @@ const GenerateInvoice = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch('https://ekarigar-accounts.vercel.app/clients');
+        const response = await fetch('https://ekarigar-accounts.onrender.com/clients');
         const data = await response.json();
         setClients(data);
       } catch (error) {
@@ -48,7 +48,7 @@ const GenerateInvoice = () => {
       }));
 
       try {
-        const response = await fetch(`https://ekarigar-accounts.vercel.app/getProjectByClientID/${clientID}`);
+        const response = await fetch(`https://ekarigar-accounts.onrender.com/getProjectByClientID/${clientID}`);
         const data = await response.json();
         setProjects(data);
       } catch (error) {
@@ -106,7 +106,7 @@ const GenerateInvoice = () => {
     };
 
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/invoices', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/invoices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ const GenerateInvoice = () => {
 
       // Send invoice items
       await Promise.all(invoiceItems.map(async (item) => {
-        const itemResponse = await fetch('https://ekarigar-accounts.vercel.app/invoiceItem', {
+        const itemResponse = await fetch('https://ekarigar-accounts.onrender.com/invoiceItem', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

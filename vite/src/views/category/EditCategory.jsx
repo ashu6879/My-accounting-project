@@ -32,7 +32,7 @@ const CategoryList = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/clientcategories?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clientcategories?page=${page}&limit=${limit}`);
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -70,7 +70,7 @@ const CategoryList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/clientcategories/${clientToDelete._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clientcategories/${clientToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -88,7 +88,7 @@ const CategoryList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.vercel.app/clientcategories/${clientToUpdate._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clientcategories/${clientToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

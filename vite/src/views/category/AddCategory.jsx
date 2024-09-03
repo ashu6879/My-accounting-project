@@ -21,7 +21,7 @@ const AddCategory = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://ekarigar-accounts.vercel.app/clientcategories', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clientcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
