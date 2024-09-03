@@ -52,7 +52,7 @@ exports.getProject = async (req, res) => {
     const { page = 1, limit = 1000 } = req.query;
     const skip = (page - 1) * limit;
     const clients = await Client.find()
-      .sort({ _id: 1 })
+      .sort({ _id: -1 })
       .skip(parseInt(skip))
       .limit(parseInt(limit));
     res.json(clients);
