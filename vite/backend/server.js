@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const compression = require('compression'); // For gzip compression
 const connectDB = require('./config/db');
 const routes = require('./routes/index');
 const Counter = require('./models/counter'); // Import the Counter model
@@ -49,14 +49,17 @@ connectDB().then(async () => {
 
 // Configure CORS
 const corsOptions = {
-  origin: 'https://admin-ekarigar.vercel.app/', // Adjust this as needed for security
+  origin: 'https://admin-ekarigar.vercel.app', // Ensure this matches your frontend URL exactly
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 
+// Apply middleware
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
+app.use(compression()); // Apply gzip compression
+app.use(express.json()); // Built-in middleware for parsing JSON
+app.use(express.urlencoded({ extended: true })); // Built-in middleware for parsing URL-encoded data
 
 // Use unified routes
 app.use('/', routes);
