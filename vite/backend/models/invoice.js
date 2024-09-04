@@ -1,10 +1,9 @@
-// models/invoice.js
 const mongoose = require('mongoose');
 
 const invoiceSchema = new mongoose.Schema({
   invID: { type: Number, required: true, unique: true },
-  clientID: { type: Number, required: true },
-  projectID: { type: Number, required: true },
+  clientID: { type: Number, required: true, ref: 'Client' },
+  projectID: { type: Number, required: true, ref: 'Project' },
   printdate: { type: Date, required: true },
   invNum: { type: String, required: true, unique: true },
   remarks: { type: String },
@@ -12,4 +11,3 @@ const invoiceSchema = new mongoose.Schema({
 }, { collection: 'invoice' }); // Explicitly set the collection name
 
 module.exports = mongoose.model('Invoice', invoiceSchema);
-

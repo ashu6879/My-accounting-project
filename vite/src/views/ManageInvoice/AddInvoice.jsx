@@ -214,50 +214,49 @@ const GenerateInvoice = () => {
               </Grid>
             </Grid>
           </Grid>
+            {selectedClient && (
+              <Grid item xs={6}>
+                <Typography variant="h6" gutterBottom>
+                  Client Details
+                </Typography>
+                <Box mb={2}>
+                  <Typography variant="subtitle1">
+                    Client Name: {selectedClient.clientName}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Client Email: {selectedClient.clientEmail}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Client Address: {selectedClient.clientAddress}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
+            {selectedProject && (
+              <Grid item xs={6}>
+                <Typography variant="h6" gutterBottom>
+                  Project Details
+                </Typography>
+                <Box mb={2}>
+                  <Typography variant="subtitle1">
+                    Project Title: {selectedProject.projectTitle}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Serviced By: {selectedProject.ServicedBy}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Sale done By: {selectedProject.SaledoneBy}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Approved By: {selectedProject.ApprovedBy}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Progress By: {selectedProject.ProgressBy}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
 
-          {/* Client and Project Details */}
-          {selectedClient && (
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Client Details
-              </Typography>
-              <Box mb={2}>
-                <Typography variant="subtitle1">
-                  Client Name: {selectedClient.clientName}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Client Email: {selectedClient.clientEmail}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Client Address: {selectedClient.clientAddress}
-                </Typography>
-              </Box>
-            </Grid>
-          )}
-          {selectedProject && (
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Project Details
-              </Typography>
-              <Box mb={2}>
-                <Typography variant="subtitle1">
-                  Project Title: {selectedProject.projectTitle}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Serviced By: {selectedProject.ServicedBy}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Sale done By: {selectedProject.SaledoneBy}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Approved By: {selectedProject.ApprovedBy}
-                </Typography>
-                <Typography variant="subtitle1">
-                  Progress By: {selectedProject.ProgressBy}
-                </Typography>
-              </Box>
-            </Grid>
-          )}
           {/* Invoice Items */}
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom>
@@ -314,6 +313,7 @@ const GenerateInvoice = () => {
               </Box>
             ))}
           </Grid>
+          
 
           {/* Remarks */}
           <Grid item xs={12}>
