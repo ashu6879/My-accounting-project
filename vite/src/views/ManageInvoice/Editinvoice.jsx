@@ -37,7 +37,7 @@ const EditInvoice = () => {
 
   const fetchInvoices = async (pageNumber) => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/invoices?page=${page}&limit=${limit}`);
       if (!response.ok) {
         throw new Error('Failed to fetch invoices');
       }
@@ -81,7 +81,7 @@ const EditInvoice = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/${invoiceToDelete._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/invoices/${invoiceToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -100,7 +100,7 @@ const EditInvoice = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/${invoiceToUpdate._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/invoices/${invoiceToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
