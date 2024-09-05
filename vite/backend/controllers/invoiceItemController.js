@@ -90,3 +90,19 @@ exports.deleteInvoiceItem = async (req, res) => {
     res.status(500).send('Error deleting invoice item');
   }
 };
+
+exports.getInvoiceItemByInvID = async (req, res) => {
+  try {
+    const { invID } = req.params;
+    const invoiceItems = await InvoiceItem.find({ invID });
+
+    if (!invoiceItems.length) {
+      return res.status(404).send('No invoice items found for this invoice ID');
+    }
+
+    res.json(invoiceItems);
+  } catch (err) {
+    console.error('Error fetching invoice items by invID:', err);
+    res.status(500).send('Error fetching invoice items');
+  }
+};

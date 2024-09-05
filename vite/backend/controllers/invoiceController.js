@@ -89,21 +89,10 @@ exports.getInvoices = async (req, res) => {
         }
       },
       {
-        $lookup: {
-          from: 'invoiceitem',
-          localField: 'invID',
-          foreignField: 'invID',
-          as: 'invoiceItems'
-        }
-      },
-      {
         $unwind: { path: '$clientDetails', preserveNullAndEmptyArrays: true }
       },
       {
         $unwind: { path: '$projectDetails', preserveNullAndEmptyArrays: true }
-      },
-      {
-        $unwind: { path: '$invoiceItems', preserveNullAndEmptyArrays: true }
       },
       {
         $project: {
@@ -124,10 +113,7 @@ exports.getInvoices = async (req, res) => {
           ServicedBy: { $ifNull: ['$projectDetails.ServicedBy', null] },
           SaledoneBy: { $ifNull: ['$projectDetails.SaledoneBy', null] },
           ApprovedBy: { $ifNull: ['$projectDetails.ApprovedBy', null] },
-          ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] },
-          itemDesc: { $ifNull: ['$invoiceItems.itemDesc', null] },
-          itemQty: { $ifNull: ['$invoiceItems.itemQty', null] },
-          itemRate: { $ifNull: ['$invoiceItems.itemRate', null] }
+          ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] }
         }
       }
     ]);
@@ -163,21 +149,10 @@ exports.getInvoiceById = async (req, res) => {
         }
       },
       {
-        $lookup: {
-          from: 'invoiceitem',
-          localField: 'invID',
-          foreignField: 'invID',
-          as: 'invoiceItems'
-        }
-      },
-      {
         $unwind: { path: '$clientDetails', preserveNullAndEmptyArrays: true }
       },
       {
         $unwind: { path: '$projectDetails', preserveNullAndEmptyArrays: true }
-      },
-      {
-        $unwind: { path: '$invoiceItems', preserveNullAndEmptyArrays: true }
       },
       {
         $project: {
@@ -199,9 +174,6 @@ exports.getInvoiceById = async (req, res) => {
           SaledoneBy: { $ifNull: ['$projectDetails.SaledoneBy', null] },
           ApprovedBy: { $ifNull: ['$projectDetails.ApprovedBy', null] },
           ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] },
-          itemDesc: { $ifNull: ['$invoiceItems.itemDesc', null] },
-          itemQty: { $ifNull: ['$invoiceItems.itemQty', null] },
-          itemRate: { $ifNull: ['$invoiceItems.itemRate', null] }
         }
       }
     ]);
