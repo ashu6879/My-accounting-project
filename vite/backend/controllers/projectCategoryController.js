@@ -38,7 +38,7 @@ exports.getProjectCategories = async (req, res) => {
 
     // Fetch categories, sorting by the newest first
     const categories = await ProjectCategory.find()
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .sort({ _id: -1 }) // Sort by createdAt in descending order
       .skip(parseInt(skip))
       .limit(parseInt(limit));
 

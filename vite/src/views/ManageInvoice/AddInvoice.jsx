@@ -106,54 +106,80 @@ const GenerateInvoice = () => {
     };
 
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/invoices', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || 'Failed to generate invoice');
-      }
-
-      // Send invoice items
-      await Promise.all(invoiceItems.map(async (item) => {
-        const itemResponse = await fetch('https://ekarigar-accounts.onrender.com/invoiceItem', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...item,
-            invID: postData.clientID, // You may need to adjust this if `invID` needs to be set differently
-          }),
+        // Create the invoice
+        const createResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
         });
 
-        if (!itemResponse.ok) {
-          const errorMessage = await itemResponse.text();
-          throw new Error(errorMessage || 'Failed to add invoice item');
+        if (!createResponse.ok) {
+            const errorMessage = await createResponse.text();
+            throw new Error(errorMessage || 'Failed to generate invoice');
         }
-      }));
 
-      setSuccess('Invoice generated successfully!');
-      setInvoiceData({
-        clientID: '',
-        projectID: '',
-        remarks: '',
-      });
-      setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
-      setProjects([]);
-      setSelectedClient(null);
-      setSelectedProject(null);
+        // Fetch the latest invoice ID
+        const invoicesResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices');
+        if (!invoicesResponse.ok) {
+            const errorMessage = await invoicesResponse.text();
+            throw new Error(errorMessage || 'Failed to fetch invoices');
+        }
+
+        const invoices = await invoicesResponse.json();
+        if (invoices.length === 0) {
+            throw new Error('No invoices found after creation');
+        }
+
+        // Assume invoices are sorted by creation date or ID in descending order
+        const latestInvoice = invoices[0]; // Adjust as necessary based on your data
+        const invID = latestInvoice.invID;
+
+        if (!invID) {
+            throw new Error('Invoice ID is null or undefined');
+        }
+
+        // Send invoice items
+        await Promise.all(invoiceItems.map(async (item) => {
+            if (!item || !item.itemDesc || item.itemQty === undefined || item.itemRate === undefined) {
+                throw new Error('Invalid invoice item data');
+            }
+
+            const itemResponse = await fetch('https://ekarigar-accounts.onrender.com/invoiceItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...item,
+                    invID, // Use the fetched invoice ID
+                }),
+            });
+
+            if (!itemResponse.ok) {
+                const errorMessage = await itemResponse.text();
+                throw new Error(errorMessage || 'Failed to add invoice item');
+            }
+        }));
+
+        setSuccess('Invoice generated successfully!');
+        setInvoiceData({
+            clientID: '',
+            projectID: '',
+            remarks: '',
+        });
+        setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
+        setProjects([]);
+        setSelectedClient(null);
+        setSelectedProject(null);
     } catch (error) {
-      setError(error.message);
+        setError(error.message);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   if (authLoading) {
     return <div>Loading...</div>;
