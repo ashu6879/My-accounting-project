@@ -78,18 +78,29 @@ exports.updateInvoiceItem = async (req, res) => {
   }
 };
 
-// Delete an invoice item by ID
-exports.deleteInvoiceItem = async (req, res) => {
+// Delete an invoice item by invtID
+exports.deleteInvoiceItemByInvtID = async (req, res) => {
   try {
-    const { id } = req.params;
-    const result = await InvoiceItem.findByIdAndDelete(id);
+    const { invtID } = req.params;
+    console.log('Received invtID:', invtID); // Debug log
+
+    // Ensure invtID is a number
+    const numericInvtID = Number(invtID);
+    if (isNaN(numericInvtID)) {
+      return res.status(400).send('Invalid invtID format');
+    }
+
+    const result = await InvoiceItem.findOneAndDelete({ invtID: numericInvtID });
     if (!result) return res.status(404).send('Invoice item not found');
+    
     res.status(200).send('Invoice item deleted');
   } catch (error) {
     console.error('Error deleting invoice item:', error);
     res.status(500).send('Error deleting invoice item');
   }
 };
+
+
 
 exports.getInvoiceItemByInvID = async (req, res) => {
   try {

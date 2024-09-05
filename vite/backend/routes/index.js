@@ -55,7 +55,7 @@ router.post('/invoiceItem', invoiceItemController.addInvoiceItem);
 router.get('/invoiceItem', invoiceItemController.getInvoiceItems);
 router.get('/invoiceItem/:id', invoiceItemController.getInvoiceItemById);
 router.put('/invoiceItem/:id', invoiceItemController.updateInvoiceItem);
-router.delete('/invoiceItem/:id', invoiceItemController.deleteInvoiceItem);
+router.delete('/invoiceItem/:invtID', invoiceItemController.deleteInvoiceItemByInvtID);
 router.get('/getInvoiceItemByInvID/:invID', invoiceItemController.getInvoiceItemByInvID); // New route
 
 module.exports = router;
