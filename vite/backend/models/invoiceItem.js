@@ -5,7 +5,8 @@ const invoiceItemSchema = new mongoose.Schema({
   invtID: { type: Number, required: true, unique: true }, // Renamed from itemID to invtID
   itemDesc: { type: String, required: true },
   itemQty: { type: Number, required: true },
-  itemRate: { type: Number, required: true }
+  itemRate: { type: Number, required: true },
+  totalRate: { type: Number, required: true }
 }, {
   collection: 'invoiceitem' // Explicitly set the collection name
 });

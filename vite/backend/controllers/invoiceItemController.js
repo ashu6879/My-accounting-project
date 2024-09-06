@@ -14,17 +14,22 @@ const getNextSequenceValue = async (sequenceName) => {
 // Add a new invoice item
 exports.addInvoiceItem = async (req, res) => {
   try {
-    const { invID,itemDesc, itemQty, itemRate } = req.body;
+    const { invID, itemDesc, itemQty, itemRate } = req.body;
 
     // Get the next invtID from the counter collection
     const invtID = await getNextSequenceValue('invtID');
 
+    // Calculate totalRate as itemQty * itemRate
+    const totalRate = itemQty * itemRate;
+
+    // Create new InvoiceItem with totalRate
     const newItem = new InvoiceItem({
       invID,
       invtID, // Use the auto-incremented invtID
       itemDesc,
       itemQty,
-      itemRate
+      itemRate,
+      totalRate, // Add totalRate field
     });
 
     await newItem.save();
