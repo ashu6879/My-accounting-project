@@ -9,6 +9,8 @@ import { Edit, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import useAuth from 'hooks/useAuth';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Tooltip from '@mui/material/Tooltip';
+
 
 const EditInvoice = () => {
   const [invoices, setInvoices] = useState([]);
@@ -100,20 +102,39 @@ const EditInvoice = () => {
     }
   };
 
+  // In the existing `handleUpdate` function
   const handleUpdate = async () => {
     try {
       const promises = updateItems.map(async (item) => {
-        const response = await fetch(`https://ekarigar-accounts.onrender.com/invoiceItem/${item.invtID}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            itemDesc: item.itemDesc,
-            itemQty: item.itemQty,
-            itemRate: item.itemRate,
-          }),
-        });
-        if (!response.ok) {
-          throw new Error('Failed to update invoice item');
+        if (item.invtID) {
+          // If the item has an invtID, it's an existing item and should be updated.
+          const response = await fetch(`https://ekarigar-accounts.onrender.com/invoiceItem/${item.invtID}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              itemDesc: item.itemDesc,
+              itemQty: item.itemQty,
+              itemRate: item.itemRate,
+            }),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to update invoice item');
+          }
+        } else {
+          // If the item doesn't have an invtID, it's a new item and should be created.
+          const response = await fetch(`https://ekarigar-accounts.onrender.com/invoiceItem`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              itemDesc: item.itemDesc,
+              itemQty: item.itemQty,
+              itemRate: item.itemRate,
+              invID: invoiceToUpdate.invID,  // Ensure the correct invID is sent for new items
+            }),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to add new invoice item');
+          }
         }
       });
 
@@ -126,7 +147,6 @@ const EditInvoice = () => {
       ));
       handleUpdateDialogClose();
     } catch (error) {
-      console.error(error);
       setError(error.message);
     }
   };
@@ -152,37 +172,50 @@ const EditInvoice = () => {
     });
   };
 
+  // Function to add a new item to the updateItems list
+  const handleAddItem = () => {
+    setUpdateItems([
+      ...updateItems,
+      { _id: new Date().getTime(), itemDesc: '', itemQty: '', itemRate: '', invtID: null, isNew: true }
+    ]);
+  };
+
+  // New function to handle deletion of the last item
+  const handleDeleteLastItem = () => {
+    setUpdateItems((prevItems) => prevItems.slice(0, -1)); // Remove the last item
+  };
+
   const handleDeleteItem = async (invtID, index) => {
     // Convert invtID to a number if it's not already
     const numericInvtID = Number(invtID);
 
     if (isNaN(numericInvtID)) {
-        setError('Invalid item ID');
-        return;
+      setError('Invalid item ID');
+      return;
     }
 
     const apiUrl = `https://ekarigar-accounts.onrender.com/invoiceItem/${numericInvtID}`;
-    
+
     try {
-        const response = await fetch(apiUrl, {
-            method: 'DELETE',
-        });
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+      });
 
-        if (response.ok) {
-          setSuccess('Item deleted successfully!');
+      if (response.ok) {
+        setSuccess('Item deleted successfully!');
 
-          // Remove item from the updateItems state
-          setUpdateItems(prevItems => prevItems.filter((_, i) => i !== index));
-        }
+        // Remove item from the updateItems state
+        setUpdateItems(prevItems => prevItems.filter((_, i) => i !== index));
+      }
 
-        else {
-            // Handle unexpected content type
-            setError('Unexpected response format. Please try again later.');
-        }
+      else {
+        // Handle unexpected content type
+        setError('Unexpected response format. Please try again later.');
+      }
     } catch (error) {
-        setError(`Error: ${error.message}`);
+      setError(`Error: ${error.message}`);
     }
-};
+  };
 
 
   if (loading) {
@@ -304,29 +337,27 @@ const EditInvoice = () => {
           <Button onClick={handleDelete} color="error">Delete</Button>
         </DialogActions>
       </Dialog>
-      
 
       {/* Update Dialog */}
-      <Dialog 
-        open={updateDialogOpen} 
-        onClose={handleUpdateDialogClose} 
-        fullWidth 
-        maxWidth="md" // Set to "sm" or "md" for a smaller dialog width
+      <Dialog
+        open={updateDialogOpen}
+        onClose={handleUpdateDialogClose}
+        fullWidth
+        maxWidth="md" // Adjust as needed
       >
         <DialogTitle>Edit Invoice Items</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {updateItems.map((item, index) => (
-              <Box 
-                key={item._id} 
-                sx={{ 
-                  display: 'flex', 
-                  flexDirection: 'row', 
-                  gap: 2, 
-                  mb: 2, 
-                  mt: 2, 
-                  alignItems: 'center', 
-                  width: '100%' // Ensures the Box takes the full width of the Dialog
+              <Box
+                key={item._id}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 2,
+                  mb: 2,
+                  alignItems: 'center',
+                  width: '100%'
                 }}
               >
                 <Typography sx={{ minWidth: '40px', textAlign: 'center' }}>{index + 1}.</Typography>
@@ -334,39 +365,55 @@ const EditInvoice = () => {
                   label="Description"
                   value={item.itemDesc}
                   onChange={(e) => handleUpdateItemChange(index, 'itemDesc', e.target.value)}
-                  sx={{ flex: 2, minWidth: '250px' }}  // Adjusted minWidth for a slightly smaller size
+                  sx={{ flex: 2, minWidth: '250px', mt: 1 }}
                 />
                 <TextField
                   label="Quantity"
                   type="number"
                   value={item.itemQty}
                   onChange={(e) => handleUpdateItemChange(index, 'itemQty', e.target.value)}
-                  sx={{ flex: 1, minWidth: '100px' }}
+                  sx={{ flex: 1, minWidth: '100px', mt: 1 }}
                 />
                 <TextField
                   label="Rate"
                   type="number"
                   value={item.itemRate}
                   onChange={(e) => handleUpdateItemChange(index, 'itemRate', e.target.value)}
-                  sx={{ flex: 1, minWidth: '100px' }}
+                  sx={{ flex: 1, minWidth: '100px', mt: 1 }}
                 />
-                <IconButton
-                color="secondary"
-                onClick={() => handleDeleteItem(item.invtID, index)}
-                sx={{ minWidth: '50px' }}
-              >
-                <DeleteIcon />
-              </IconButton>
+                <Tooltip title={item.isNew ? "This item is unsaved. Click on the common delete button to remove." : ""}>
+                  <span>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => handleDeleteItem(item.invtID, index)}
+                      sx={{ minWidth: '50px', opacity: item.isNew ? 0.5 : 1 }} // Fade effect for delete button only
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
               </Box>
             ))}
+            <Box display="flex" justifyContent="space-between" mt={2}>
+              <Button variant="contained" color="primary" onClick={handleAddItem}>
+                Add Item
+              </Button>
+              {/* Only show the common delete button if there's at least one new item */}
+              {updateItems.some(item => item.isNew) && (
+                <IconButton color="secondary" onClick={handleDeleteLastItem}>
+                  <DeleteIcon /> {/* Common delete button for last item */}
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </DialogContent>
+
+
         <DialogActions>
           <Button onClick={handleUpdateDialogClose}>Cancel</Button>
           <Button onClick={handleUpdate} color="primary">Update</Button>
         </DialogActions>
       </Dialog>
-
       {/* Success Snackbar */}
       <Snackbar open={!!success} autoHideDuration={6000} onClose={() => setSuccess('')}>
         <Alert onClose={() => setSuccess('')} severity="success">
