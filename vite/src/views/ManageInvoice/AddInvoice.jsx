@@ -317,7 +317,7 @@ const GenerateInvoice = () => {
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <TextField
-                      type="number"
+                      type="numeric"
                       label="Rate"
                       name="itemRate"
                       variant="outlined"

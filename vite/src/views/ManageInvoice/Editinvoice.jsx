@@ -376,7 +376,7 @@ const EditInvoice = () => {
                 />
                 <TextField
                   label="Rate"
-                  type="number"
+                  type="numeric"
                   value={item.itemRate}
                   onChange={(e) => handleUpdateItemChange(index, 'itemRate', e.target.value)}
                   sx={{ flex: 1, minWidth: '100px', mt: 1 }}
