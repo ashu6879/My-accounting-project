@@ -62,21 +62,26 @@ exports.getInvoiceItemById = async (req, res) => {
 // Update an invoice item by ID
 exports.updateInvoiceItem = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { invtID } = req.params;
     const { itemDesc, itemQty, itemRate } = req.body;
 
-    const updatedItem = await InvoiceItem.findByIdAndUpdate(
-      id,
+    const updatedItem = await InvoiceItem.findOneAndUpdate(
+      { invtID },
       { itemDesc, itemQty, itemRate, total: itemQty * itemRate },
       { new: true, runValidators: true }
     );
-    if (!updatedItem) return res.status(404).send('Invoice item not found');
+    
+    if (!updatedItem) {
+      return res.status(404).send('InvoiceID not found');
+    }
+    
     res.status(200).json(updatedItem);
   } catch (error) {
     console.error('Error updating invoice item:', error);
     res.status(500).send('Error updating invoice item');
   }
 };
+
 
 // Delete an invoice item by invtID
 exports.deleteInvoiceItemByInvtID = async (req, res) => {
