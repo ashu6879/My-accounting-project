@@ -5,6 +5,9 @@ import {
 import LoadingButton from 'ui-component/LoadingButton'; // Assuming you have this custom component
 import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
 import useAuth from 'hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const GenerateInvoice = () => {
   const [clients, setClients] = useState([]);
@@ -21,6 +24,7 @@ const GenerateInvoice = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -169,10 +173,16 @@ const GenerateInvoice = () => {
             projectID: '',
             remarks: '',
         });
+
+
         setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
         setProjects([]);
         setSelectedClient(null);
         setSelectedProject(null);
+
+        setTimeout(() => {
+          navigate('/ManageInvoice/edit');
+        }, 2000);
     } catch (error) {
         setError(error.message);
     } finally {
