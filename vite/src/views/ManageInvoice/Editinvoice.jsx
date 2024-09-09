@@ -347,66 +347,79 @@ const EditInvoice = () => {
       >
         <DialogTitle>Edit Invoice Items</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {updateItems.map((item, index) => (
-              <Box
-                key={item._id}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  gap: 2,
-                  mb: 2,
-                  alignItems: 'center',
-                  width: '100%'
-                }}
-              >
-                <Typography sx={{ minWidth: '40px', textAlign: 'center' }}>{index + 1}.</Typography>
-                <TextField
-                  label="Description"
-                  value={item.itemDesc}
-                  onChange={(e) => handleUpdateItemChange(index, 'itemDesc', e.target.value)}
-                  sx={{ flex: 2, minWidth: '250px', mt: 1 }}
-                />
-                <TextField
-                  label="Quantity"
-                  type="number"
-                  value={item.itemQty}
-                  onChange={(e) => handleUpdateItemChange(index, 'itemQty', e.target.value)}
-                  sx={{ flex: 1, minWidth: '100px', mt: 1 }}
-                />
-                <TextField
-                  label="Rate"
-                  type="numeric"
-                  value={item.itemRate}
-                  onChange={(e) => handleUpdateItemChange(index, 'itemRate', e.target.value)}
-                  sx={{ flex: 1, minWidth: '100px', mt: 1 }}
-                />
-                <Tooltip title={item.isNew ? "This item is unsaved. Click on the common delete button to remove." : ""}>
-                  <span>
-                    <IconButton
-                      color="secondary"
-                      onClick={() => handleDeleteItem(item.invtID, index)}
-                      sx={{ minWidth: '50px', opacity: item.isNew ? 0.5 : 1 }} // Fade effect for delete button only
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              </Box>
-            ))}
-            <Box display="flex" justifyContent="space-between" mt={2}>
-              <Button variant="contained" color="primary" onClick={handleAddItem}>
-                Add Item
-              </Button>
-              {/* Only show the common delete button if there's at least one new item */}
-              {updateItems.some(item => item.isNew) && (
-                <IconButton color="secondary" onClick={handleDeleteLastItem}>
-                  <DeleteIcon /> {/* Common delete button for last item */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {updateItems.map((item, index) => (
+          <Box
+            key={item._id}
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 2,
+              mb: 2,
+              alignItems: 'center',
+              width: '100%'
+            }}
+          >
+            <Typography
+              sx={{ minWidth: '40px', textAlign: 'center', mb: { xs: 1, sm: 0 } }}
+            >
+              {index + 1}.
+            </Typography>
+            <TextField
+              label="Description"
+              value={item.itemDesc}
+              onChange={(e) => handleUpdateItemChange(index, 'itemDesc', e.target.value)}
+              sx={{ flex: 2, minWidth: { xs: '100%', sm: '250px' }, mt: 1 }}
+            />
+            <TextField
+              label="Quantity"
+              type="number"
+              value={item.itemQty}
+              onChange={(e) => handleUpdateItemChange(index, 'itemQty', e.target.value)}
+              sx={{ flex: 1, minWidth: { xs: '100%', sm: '100px' }, mt: 1 }}
+            />
+            <TextField
+              label="Rate"
+              type="number"
+              value={item.itemRate}
+              onChange={(e) => handleUpdateItemChange(index, 'itemRate', e.target.value)}
+              sx={{ flex: 1, minWidth: { xs: '100%', sm: '100px' }, mt: 1 }}
+            />
+            <Tooltip title={item.isNew ? "This item is unsaved. Click on the common delete button to remove." : ""}>
+              <span>
+                <IconButton
+                  color="secondary"
+                  onClick={() => handleDeleteItem(item.invtID, index)}
+                  sx={{ minWidth: '50px', opacity: item.isNew ? 0.5 : 1 }}
+                >
+                  <DeleteIcon />
                 </IconButton>
-              )}
-            </Box>
+              </span>
+            </Tooltip>
           </Box>
-        </DialogContent>
+        ))}
+        <Box
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          mt={2}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddItem}
+            sx={{ mb: { xs: 2, sm: 0 } }}
+          >
+            Add Item
+          </Button>
+          {updateItems.some(item => item.isNew) && (
+            <IconButton color="secondary" onClick={handleDeleteLastItem}>
+              <DeleteIcon /> {/* Common delete button for last item */}
+            </IconButton>
+          )}
+        </Box>
+      </Box>
+    </DialogContent>
 
 
         <DialogActions>
