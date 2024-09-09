@@ -106,6 +106,7 @@ exports.getInvoices = async (req, res) => {
           remarks: 1,
           invDate: 1,
           printdate: 1,
+          currencyID:1,
           clientName: { $ifNull: ['$clientDetails.clientName', null] },
           clientEmail: { $ifNull: ['$clientDetails.clientEmail', null] },
           clientPhone: { $ifNull: ['$clientDetails.clientPhone', null] },
@@ -115,7 +116,7 @@ exports.getInvoices = async (req, res) => {
           ServicedBy: { $ifNull: ['$projectDetails.ServicedBy', null] },
           SaledoneBy: { $ifNull: ['$projectDetails.SaledoneBy', null] },
           ApprovedBy: { $ifNull: ['$projectDetails.ApprovedBy', null] },
-          ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] }
+          ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] },
         }
       }
     ]);

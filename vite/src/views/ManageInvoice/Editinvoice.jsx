@@ -5,11 +5,12 @@ import {
   TableRow, Dialog, DialogActions, DialogContent,
   DialogTitle, Box, TextField, TableContainer, Paper
 } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete, PictureAsPdf  } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import useAuth from 'hooks/useAuth';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
+import { generatePDF } from '../../ui-component/generatePDF'; // Import the PDF generation function
 
 
 const EditInvoice = () => {
@@ -296,6 +297,9 @@ const EditInvoice = () => {
                     </IconButton>
                     <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(invoice)}>
                       <Delete />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => generatePDF(invoice)}>
+                      <PictureAsPdf  />
                     </IconButton>
                   </Box>
                 </TableCell>
