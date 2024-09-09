@@ -2,12 +2,13 @@ const Invoice = require('../models/invoice');
 const Client = require('../models/client');
 const Project = require('../models/project');
 const InvoiceItem = require('../models/invoiceItem');
+const currency = require('../models/currency');
 const Counter = require('../models/counter'); // Import the Counter model for generating unique IDs
 
 // Add a new invoice
 exports.addInvoice = async (req, res) => {
   try {
-    const { clientID, projectID, remarks, invDate, printdate } = req.body;
+    const { clientID, projectID, remarks, invDate, printdate,currencyID } = req.body;
 
     // Get the next invID and invNum from the counter collection
     const [invIDCounter, invNumCounter] = await Promise.all([
@@ -44,6 +45,7 @@ exports.addInvoice = async (req, res) => {
       projectID,
       invNum, // Set the auto-incremented invNum
       remarks,
+      currencyID,
       invDate: autoFilledInvDate, // Autofilled or provided invDate
       printdate: autoFilledPrintDate // Autofilled or provided printdate
     });

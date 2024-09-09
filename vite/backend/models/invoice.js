@@ -8,6 +8,7 @@ const invoiceSchema = new mongoose.Schema({
   invNum: { type: String, required: true, unique: true },
   remarks: { type: String },
   invDate: { type: Date, required: true },
+  currencyID: { type: Number, required: true },
 }, { collection: 'invoice' }); // Explicitly set the collection name
 
 module.exports = mongoose.model('Invoice', invoiceSchema);

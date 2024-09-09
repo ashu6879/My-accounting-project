@@ -6,6 +6,7 @@ const clientController = require('../controllers/clientController'); // Import t
 const projectController = require('../controllers/projectController');
 const invoiceController = require('../controllers/invoiceController');
 const invoiceItemController = require('../controllers/invoiceItemController');
+const currencyController = require('../controllers/currencyController');
 
 const router = express.Router();
 
@@ -57,5 +58,10 @@ router.get('/invoiceItem/:id', invoiceItemController.getInvoiceItemById);
 router.put('/invoiceItem/:invtID', invoiceItemController.updateInvoiceItem);
 router.delete('/invoiceItem/:invtID', invoiceItemController.deleteInvoiceItemByInvtID);
 router.get('/getInvoiceItemByInvID/:invID', invoiceItemController.getInvoiceItemByInvID); // New route
+
+router.post('/currencies', currencyController.addCurrency);
+router.get('/currencies', currencyController.getCurrency);
+router.delete('/currencies/:id', currencyController.deleteCurrency);
+router.put('/currencies/:id', currencyController.updateCurrency);
 
 module.exports = router;

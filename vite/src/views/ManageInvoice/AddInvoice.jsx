@@ -15,9 +15,11 @@ const GenerateInvoice = () => {
   const [invoiceItems, setInvoiceItems] = useState([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [currencies, setCurrencies] = useState([]); // State for currencies
   const [invoiceData, setInvoiceData] = useState({
     clientID: '',
     projectID: '',
+    currencyID: '', // Add currency to the invoiceData state
     remarks: '',
   });
   const [loading, setLoading] = useState(false);
@@ -36,8 +38,18 @@ const GenerateInvoice = () => {
         setError('Failed to fetch clients');
       }
     };
+    const fetchCurrencies = async () => {
+      try {
+        const response = await fetch('https://ekarigar-accounts.onrender.com/currencies');
+        const data = await response.json();
+        setCurrencies(data);
+      } catch (error) {
+        setError('Failed to fetch currencies');
+      }
+    };
 
     fetchClients();
+    fetchCurrencies();
   }, []);
 
   const handleClientChange = async (event) => {
@@ -87,6 +99,13 @@ const GenerateInvoice = () => {
     newItems[index] = { ...newItems[index], [name]: value };
     setInvoiceItems(newItems);
   };
+  const handleCurrencyChange = (event) => {
+    const currencyID = event.target.value;
+    setInvoiceData(prevData => ({
+      ...prevData,
+      currencyID, // Update state with selected currency ID
+    }));
+  };
 
   const addItem = () => {
     setInvoiceItems(prevItems => [
@@ -106,6 +125,7 @@ const GenerateInvoice = () => {
     const postData = {
       clientID: invoiceData.clientID,
       projectID: invoiceData.projectID,
+      currencyID: invoiceData.currencyID, // Include currency in the postData
       remarks: invoiceData.remarks,
     };
 
@@ -171,6 +191,7 @@ const GenerateInvoice = () => {
         setInvoiceData({
             clientID: '',
             projectID: '',
+            currencyID: '', // Reset currency
             remarks: '',
         });
 
@@ -249,6 +270,26 @@ const GenerateInvoice = () => {
                 </FormControl>
               </Grid>
             </Grid>
+          </Grid>
+          {/* Currency Selection */}
+          <Grid item xs={12}>
+            <FormControl variant="outlined" fullWidth required>
+              <InputLabel id="currency-label">Select Currency</InputLabel>
+              <Select
+                labelId="currency-label"
+                id="currency"
+                name="currency"
+                value={invoiceData.currencyName}
+                onChange={handleCurrencyChange}
+                label="Select Currency"
+              >
+                {currencies.map(currency => (
+                  <MenuItem key={currency.currencyID} value={currency.currencyID}>
+                    {currency.currencyName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
             {selectedClient && (
               <Grid item xs={6}>
