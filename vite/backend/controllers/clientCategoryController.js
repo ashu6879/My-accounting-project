@@ -29,20 +29,26 @@ exports.addClientCategory = async (req, res) => {
   }
 };
 
-// Get client categories (with pagination)
+// Get client categories (with pagination and search)
 exports.getClientCategories = async (req, res) => {
   try {
-    const { page = 1, limit = 1000 } = req.query;
+    const { page = 1, limit = 1000, search = '' } = req.query;
     const skip = (page - 1) * limit;
-    const categories = await ClientCategory.find()
+
+    // Create a search filter
+    const searchFilter = search ? { ccName: new RegExp(search, 'i') } : {};
+
+    const categories = await ClientCategory.find(searchFilter)
       .sort({ _id: -1 })
       .skip(parseInt(skip))
       .limit(parseInt(limit));
+    
     res.json(categories);
   } catch (error) {
     res.status(500).send('Server Error');
   }
 };
+
 
 // Get all client categories (no pagination)
 exports.getAllClientCategories = async (req, res) => {

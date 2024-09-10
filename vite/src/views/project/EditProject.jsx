@@ -17,10 +17,11 @@ const CategoriesList = () => {
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [categoryToUpdate, setCategoryToUpdate] = useState(null);
+  const [updateName, setUpdateName] = useState('');
+  const [search, setSearch] = useState(''); // Search term
   const [page, setPage] = useState(1); // Current page
   const [limit, setLimit] = useState(20); // Number of items per page
   const [hasMore, setHasMore] = useState(true); // Flag to check if more items are available
-  const [updateName, setUpdateName] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth(); // Use the custom hook
 
@@ -28,11 +29,13 @@ const CategoriesList = () => {
     if (isAuthenticated) {
       fetchCategories();
     }
-  }, [page, isAuthenticated]);
+  }, [page, isAuthenticated, search]); // Fetch categories whenever page or search changes
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/projectcategories?page=${page}&limit=${limit}`);
+      const response = await fetch(
+        `https://ekarigar-accounts.onrender.com/projectcategories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
+      );
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
@@ -45,6 +48,12 @@ const CategoriesList = () => {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset page to 1 when search term changes
+    setCategories([]); // Clear current categories to show filtered results
   };
 
   const handleEdit = (category) => {
@@ -128,8 +137,18 @@ const CategoriesList = () => {
         Project Categories
       </Typography>
       <Typography variant="h6" gutterBottom>
-        Total Categories  As per page: {categories.length}
+        Total Categories As per page: {categories.length}
       </Typography>
+      {/* Search Input */}
+      <TextField
+        label="Search Categories"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={search}
+        onChange={handleSearchChange} // Update search term and reset categories
+        placeholder="Search by category name"
+      />
       <Table>
         <TableHead>
           <TableRow>
@@ -240,8 +259,6 @@ const CategoriesList = () => {
             variant="outlined"
             value={updateName}
             onChange={(e) => setUpdateName(e.target.value)}
-            placeholder="Enter new category name"
-            sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>
@@ -255,22 +272,18 @@ const CategoriesList = () => {
       </Dialog>
 
       {/* Success Snackbar */}
-      {success && (
-        <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
-          <Alert onClose={() => setSuccess('')} severity="success" sx={{ width: '100%' }}>
-            {success}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar open={!!success} autoHideDuration={6000} onClose={() => setSuccess('')}>
+        <Alert onClose={() => setSuccess('')} severity="success">
+          {success}
+        </Alert>
+      </Snackbar>
 
       {/* Error Snackbar */}
-      {error && (
-        <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError('')}>
-          <Alert onClose={() => setError('')} severity="error" sx={{ width: '100%' }}>
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')}>
+        <Alert onClose={() => setError('')} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

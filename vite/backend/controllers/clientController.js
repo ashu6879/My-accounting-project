@@ -44,20 +44,27 @@ exports.addClient = async (req, res) => {
   }
 };
 
-// Get a list of clients
+// Get a list of clients with optional search
 exports.getClients = async (req, res) => {
   try {
-    const { page = 1, limit = 3000 } = req.query;
+    const { page = 1, limit = 3000, search = '' } = req.query;
     const skip = (page - 1) * limit;
-    const clients = await Client.find()
+    
+    // Create a regex pattern for case-insensitive search
+    const searchPattern = new RegExp(search, 'i');
+
+    // Filter clients based on the search term
+    const clients = await Client.find({ clientName: { $regex: searchPattern } })
       .sort({ _id: -1 })
       .skip(parseInt(skip))
       .limit(parseInt(limit));
+    
     res.json(clients);
   } catch (error) {
     res.status(500).send('Server Error');
   }
 };
+
 
 // Get total count of clients
 exports.getTotalClients = async (req, res) => {

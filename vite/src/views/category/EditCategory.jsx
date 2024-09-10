@@ -21,6 +21,7 @@ const CategoryList = () => {
   const [limit, setLimit] = useState(20); // Number of items per page
   const [hasMore, setHasMore] = useState(true); // Flag to check if more items are available
   const [updateName, setUpdateName] = useState(''); // State for the name to be updated
+  const [searchTerm, setSearchTerm] = useState(''); // State for the search term
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth(); // Use the custom hook
 
@@ -28,11 +29,11 @@ const CategoryList = () => {
     if (isAuthenticated) {
       fetchClients();
     }
-  }, [page, isAuthenticated]);
+  }, [page, isAuthenticated, searchTerm]); // Include searchTerm in the dependencies
 
   const fetchClients = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/clientcategories?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clientcategories?page=${page}&limit=${limit}&search=${searchTerm}`);
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -114,6 +115,12 @@ const CategoryList = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1); // Reset page number to 1 when search term changes
+    setClients([]); // Clear existing clients when search term changes
+  };
+
   if (loading) {
     return <div>Loading...</div>; // Show a loading indicator while checking authentication
   }
@@ -125,10 +132,18 @@ const CategoryList = () => {
   return (
     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
-      Category List
+        Category List
       </Typography>
+      <TextField
+        label="Search Categories"
+        variant="outlined"
+        fullWidth
+        value={searchTerm}
+        onChange={handleSearchChange}
+        sx={{ mb: 2 }}
+      />
       <Typography variant="h6" gutterBottom>
-        Total Clients  As per page: {clients.length}
+        Total Clients As per page: {clients.length}
       </Typography>
       <Table>
         <TableHead>
@@ -254,22 +269,26 @@ const CategoryList = () => {
       </Dialog>
 
       {/* Success Snackbar */}
-      {success && (
-        <Snackbar open={Boolean(success)} autoHideDuration={6000} onClose={() => setSuccess('')}>
-          <Alert onClose={() => setSuccess('')} severity="success" sx={{ width: '100%' }}>
-            {success}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess('')}
+      >
+        <Alert onClose={() => setSuccess('')} severity="success" sx={{ width: '100%' }}>
+          {success}
+        </Alert>
+      </Snackbar>
 
       {/* Error Snackbar */}
-      {error && (
-        <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError('')}>
-          <Alert onClose={() => setError('')} severity="error" sx={{ width: '100%' }}>
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError('')}
+      >
+        <Alert onClose={() => setError('')} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

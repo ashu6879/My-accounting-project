@@ -30,14 +30,20 @@ exports.addProjectCategory = async (req, res) => {
   }
 };
 
-// Get Project Categories (Paginated)
+// Get Project Categories (Paginated with Search)
 exports.getProjectCategories = async (req, res) => {
   try {
-    const { page = 1, limit = 3000 } = req.query;
+    const { page = 1, limit = 3000, search = '' } = req.query;
     const skip = (page - 1) * limit;
 
-    // Fetch categories, sorting by the newest first
-    const categories = await ProjectCategory.find()
+    // Build the query object based on the search parameter
+    const query = {};
+    if (search) {
+      query.pcName = { $regex: search, $options: 'i' }; // Case-insensitive search
+    }
+
+    // Fetch categories based on the query, sorting by the newest first
+    const categories = await ProjectCategory.find(query)
       .sort({ _id: -1 }) // Sort by createdAt in descending order
       .skip(parseInt(skip))
       .limit(parseInt(limit));
@@ -48,6 +54,7 @@ exports.getProjectCategories = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
 
 // Get Total Categories Count
 exports.getTotalCategories = async (req, res) => {

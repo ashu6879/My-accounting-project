@@ -28,6 +28,7 @@ const CategoryList = () => {
   const [updateEmail, setUpdateEmail] = useState('');
   const [updateCategory, setUpdateCategory] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [search, setSearch] = useState(''); // Search term
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
 
@@ -36,11 +37,11 @@ const CategoryList = () => {
       fetchClients();
       fetchCategories();
     }
-  }, [isAuthenticated, page]);
+  }, [isAuthenticated, page, search]); // Add `search` to dependency array
 
   const fetchClients = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/clients?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clients?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -144,6 +145,12 @@ const CategoryList = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset page number when search term changes
+    setClients([]); // Clear existing clients when search term changes
+  };
+
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -164,6 +171,16 @@ const CategoryList = () => {
       <Typography variant="h6" gutterBottom>
         Total Clients As per page: {clients.length}
       </Typography>
+
+      <Box mb={2}>
+        <TextField
+          label="Search Clients"
+          variant="outlined"
+          fullWidth
+          value={search}
+          onChange={handleSearchChange}
+        />
+      </Box>
 
       <IconButton
         edge="start"
@@ -245,6 +262,7 @@ const CategoryList = () => {
         </Table>
       </TableContainer>
 
+      {/* Load More Button */}
       {hasMore && (
         <Box textAlign="right" mt={2}>
           <Button
@@ -257,7 +275,8 @@ const CategoryList = () => {
               '&:hover': {
                 backgroundColor: '#003d99', // Darker background on hover
                 color: 'white',
-                transform: 'scale(1.05)', // Slightly enlarge button on hover
+                transform: 'scale(1.05)', // Slightly enlarge the button
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Add shadow on hover
               },
             }}
           >
@@ -266,19 +285,21 @@ const CategoryList = () => {
         </Box>
       )}
 
+      {/* Delete Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
         <DialogTitle>Delete Client</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this "{clientToDelete?.clientName}" client?
+          Are you sure you want to delete {clientToDelete?.clientName}?
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-          <Button onClick={handleDelete} color="error">
+          <Button color="secondary" onClick={handleDelete}>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Update Dialog */}
       <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
         <DialogTitle>Update Client</DialogTitle>
         <DialogContent>
@@ -311,8 +332,8 @@ const CategoryList = () => {
             onChange={(e) => setUpdateEmail(e.target.value)}
           />
           <TextField
+            label="Category"
             select
-            label="Client Category"
             fullWidth
             margin="normal"
             value={updateCategory}
@@ -327,14 +348,15 @@ const CategoryList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleUpdateDialogClose}>Cancel</Button>
-          <Button onClick={handleUpdate} color="primary">
+          <Button color="primary" onClick={handleUpdate}>
             Update
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Error Snackbar */}
       <Snackbar
-        open={!!error}
+        open={Boolean(error)}
         autoHideDuration={6000}
         onClose={() => setError('')}
       >
@@ -342,8 +364,10 @@ const CategoryList = () => {
           {error}
         </Alert>
       </Snackbar>
+
+      {/* Success Snackbar */}
       <Snackbar
-        open={!!success}
+        open={Boolean(success)}
         autoHideDuration={6000}
         onClose={() => setSuccess('')}
       >
@@ -351,6 +375,22 @@ const CategoryList = () => {
           {success}
         </Alert>
       </Snackbar>
+
+      {/* Drawer */}
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+      >
+        <List>
+          <ListItem button onClick={() => navigate('/home')}>
+            <ListItemText primary="Home" />
+          </ListItem>
+          <ListItem button onClick={() => navigate('/clients')}>
+            <ListItemText primary="Clients" />
+          </ListItem>
+        </List>
+      </Drawer>
     </Container>
   );
 };
