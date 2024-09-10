@@ -174,7 +174,7 @@ const CategoryList = () => {
 
       <Box mb={2}>
         <TextField
-          label="Search Clients"
+          label="Search Clients Name"
           variant="outlined"
           fullWidth
           value={search}

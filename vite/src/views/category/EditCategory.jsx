@@ -135,7 +135,7 @@ const CategoryList = () => {
         Category List
       </Typography>
       <TextField
-        label="Search Categories"
+        label="Search Client Categories"
         variant="outlined"
         fullWidth
         value={searchTerm}

@@ -141,7 +141,7 @@ const CategoriesList = () => {
       </Typography>
       {/* Search Input */}
       <TextField
-        label="Search Categories"
+        label="Search projects"
         variant="outlined"
         fullWidth
         margin="normal"

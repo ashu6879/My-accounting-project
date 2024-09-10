@@ -71,10 +71,11 @@ exports.getInvoices = async (req, res) => {
     const { page = 1, limit = 1000, search } = req.query;
     const skip = (page - 1) * limit;
 
+    const matchStage = search
+      ? { clientName: { $regex: new RegExp(search, 'i') } } // Case-insensitive search
+      : {};
+
     const invoices = await Invoice.aggregate([
-      { $sort: { _id: -1 } },
-      { $skip: parseInt(skip, 10) },
-      { $limit: parseInt(limit, 10) },
       {
         $lookup: {
           from: 'clients',
@@ -121,20 +122,19 @@ exports.getInvoices = async (req, res) => {
         }
       },
       {
-        // Apply the search query after lookup and unwind stages
-        $match: search
-          ? { clientName: { $regex: new RegExp(search, 'i') } } // Case-insensitive search
-          : {}
-      }
+        $match: matchStage // Apply search filter
+      },
+      { $sort: { _id: -1 } }, // Sort after filtering
+      { $skip: parseInt(skip, 10) }, // Apply pagination after search
+      { $limit: parseInt(limit, 10) } // Limit results after pagination
     ]);
 
     res.json(invoices);
   } catch (error) {
-    console.error('Error fetching invoices:', error);
-    res.status(500).send('Server Error');
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching invoices', error });
   }
 };
-
 
 
 // Get a specific invoice with joined collections, flattened

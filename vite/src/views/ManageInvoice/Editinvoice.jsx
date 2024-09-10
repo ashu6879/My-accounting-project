@@ -243,7 +243,7 @@ const EditInvoice = () => {
       </Typography>
             {/* Search Input */}
         <TextField
-        label="Search Categories"
+        label="Search Invoices with Client Name"
         variant="outlined"
         fullWidth
         margin="normal"

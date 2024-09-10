@@ -206,7 +206,7 @@ const ProjectList = () => {
         margin="normal"
         value={search}
         onChange={handleSearchChange} // Update search term and reset categories
-        placeholder="Search by category name"
+        placeholder="Search by project name"
       />
       <IconButton
         edge="start"
