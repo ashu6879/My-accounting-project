@@ -24,6 +24,7 @@ const EditInvoice = () => {
   const [invoiceToUpdate, setInvoiceToUpdate] = useState(null);
   const [updateItems, setUpdateItems] = useState([]);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState(''); // Search term
   const [hasMore, setHasMore] = useState(true); // Flag to check if more items are available
   const [limit, setLimit] = useState(20);
   const navigate = useNavigate();
@@ -33,11 +34,11 @@ const EditInvoice = () => {
     if (isAuthenticated) {
       fetchInvoices(page);
     }
-  }, [isAuthenticated, page]);
+  }, [isAuthenticated, page,search]);
 
   const fetchInvoices = async (pageNumber) => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/invoices?page=${pageNumber}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/invoices?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch invoices');
       }
@@ -48,6 +49,11 @@ const EditInvoice = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset page to 1 when search term changes
+    setInvoices([]); // Clear current categories to show filtered results
+  };
   const fetchInvoiceItemsByInvID = async (invID) => {
     try {
       const response = await fetch(`https://ekarigar-accounts.onrender.com/getInvoiceItemByInvID/${invID}`);
@@ -235,6 +241,16 @@ const EditInvoice = () => {
       <Typography variant="h6" gutterBottom>
         Total Clients As per page: {invoices.length}
       </Typography>
+            {/* Search Input */}
+        <TextField
+        label="Search Categories"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={search}
+        onChange={handleSearchChange} // Update search term and reset categories
+        placeholder="Search by category name"
+      />
 
       <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
         <Table>

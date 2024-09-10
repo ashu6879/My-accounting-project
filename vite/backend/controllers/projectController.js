@@ -46,20 +46,31 @@ exports.addProject = async (req, res) => {
   }
 };
 
-// Get a list of clients
+// Get a list of projects with optional search by projectTitle
 exports.getProject = async (req, res) => {
   try {
-    const { page = 1, limit = 1000 } = req.query;
+    const { page = 1, limit = 1000, search } = req.query; // Extract search parameter
     const skip = (page - 1) * limit;
-    const clients = await Client.find()
-      .sort({ _id: -1 })
-      .skip(parseInt(skip))
-      .limit(parseInt(limit));
+
+    // Build the query object based on the search parameter
+    const query = {};
+    if (search) {
+      query.projectTitle = { $regex: new RegExp(search, 'i') }; // Case-insensitive search
+    }
+
+    // Fetch projects with optional search and pagination
+    const clients = await Client.find(query)
+      .sort({ _id: -1 }) // Sort by descending _id (or adjust sorting as needed)
+      .skip(parseInt(skip, 10)) // Skip records for pagination
+      .limit(parseInt(limit, 10)); // Limit number of records returned
+
     res.json(clients);
   } catch (error) {
+    console.error('Error details:', error); // Log the error details for debugging
     res.status(500).send('Server Error');
   }
 };
+
 
 // Get total count of clients
 exports.getTotalProject = async (req, res) => {

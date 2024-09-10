@@ -30,6 +30,7 @@ const ProjectList = () => {
   const [updateCategory, setUpdateCategory] = useState('');
   const [updateclients, setUpdateclients] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false); // Initialize drawer state
+  const [search, setSearch] = useState(''); // Search term
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
 
@@ -39,11 +40,11 @@ const ProjectList = () => {
       fetchCategories();
       fetchClientCategories();
     }
-  }, [isAuthenticated, page]);
+  }, [isAuthenticated, page,search]);
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects?page=${page}&limit=${limit}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
@@ -115,6 +116,11 @@ const ProjectList = () => {
   const handleUpdateDialogClose = () => {
     setUpdateDialogOpen(false);
     setProjectToUpdate(null);
+  };
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset page to 1 when search term changes
+    setProjects([]); // Clear current categories to show filtered results
   };
 
   const handleDelete = async () => {
@@ -192,7 +198,16 @@ const ProjectList = () => {
       <Typography variant="h6" gutterBottom>
         Total Projects As per page: {projects.length}
       </Typography>
-
+      {/* Search Input */}
+      <TextField
+        label="Search projects"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={search}
+        onChange={handleSearchChange} // Update search term and reset categories
+        placeholder="Search by category name"
+      />
       <IconButton
         edge="start"
         color="inherit"

@@ -65,15 +65,16 @@ exports.addInvoice = async (req, res) => {
 };
 
 // Get a list of invoices with joined collections, flattened
+// Get a list of invoices with joined collections, flattened, and optional search by clientName
 exports.getInvoices = async (req, res) => {
   try {
-    const { page = 1, limit = 1000 } = req.query;
+    const { page = 1, limit = 1000, search } = req.query;
     const skip = (page - 1) * limit;
 
     const invoices = await Invoice.aggregate([
       { $sort: { _id: -1 } },
-      { $skip: parseInt(skip) },
-      { $limit: parseInt(limit) },
+      { $skip: parseInt(skip, 10) },
+      { $limit: parseInt(limit, 10) },
       {
         $lookup: {
           from: 'clients',
@@ -106,7 +107,7 @@ exports.getInvoices = async (req, res) => {
           remarks: 1,
           invDate: 1,
           printdate: 1,
-          currencyID:1,
+          currencyID: 1,
           clientName: { $ifNull: ['$clientDetails.clientName', null] },
           clientEmail: { $ifNull: ['$clientDetails.clientEmail', null] },
           clientPhone: { $ifNull: ['$clientDetails.clientPhone', null] },
@@ -118,6 +119,12 @@ exports.getInvoices = async (req, res) => {
           ApprovedBy: { $ifNull: ['$projectDetails.ApprovedBy', null] },
           ProgressBy: { $ifNull: ['$projectDetails.ProgressBy', null] },
         }
+      },
+      {
+        // Apply the search query after lookup and unwind stages
+        $match: search
+          ? { clientName: { $regex: new RegExp(search, 'i') } } // Case-insensitive search
+          : {}
       }
     ]);
 
@@ -127,6 +134,8 @@ exports.getInvoices = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+
 
 // Get a specific invoice with joined collections, flattened
 exports.getInvoiceById = async (req, res) => {
