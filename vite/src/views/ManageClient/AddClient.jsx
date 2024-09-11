@@ -9,6 +9,7 @@ const AddClient = () => {
     clientName: '',
     clientAddress: '',
     clientPhone: '',
+    clientGst:"",
     clientEmail: '',
     clientCat: '', // Updated from 'category'
   });
@@ -68,6 +69,7 @@ const AddClient = () => {
         clientAddress: '',
         clientPhone: '',
         clientEmail: '',
+        clientGst:"",
         clientCat: '', // Updated from 'category'
       });
 
@@ -118,13 +120,22 @@ const AddClient = () => {
         />
         <TextField
           label="Phone"
-          name="clientPhone"
+          name="clientGst"
+          variant="outlined"
+          fullWidth
+          value={clientData.clientGst}
+          onChange={handleChange}
+          margin="normal"
+          required
+        />
+        <TextField
+          label="GST Number"
+          name="clientGst"
           variant="outlined"
           fullWidth
           value={clientData.clientPhone}
           onChange={handleChange}
           margin="normal"
-          required
         />
         <TextField
           label="Email"

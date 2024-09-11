@@ -19,7 +19,7 @@ const getNextSequenceValue = async (counterName) => {
 // Add a new client
 exports.addClient = async (req, res) => {
   try {
-    const { clientName, clientEmail, clientPhone, clientAddress, clientCat } = req.body;
+    const { clientName, clientEmail, clientPhone,clientGst, clientAddress, clientCat } = req.body;
 
     // Check if the client already exists
     const existingClient = await Client.findOne({ clientEmail });
@@ -29,7 +29,7 @@ exports.addClient = async (req, res) => {
     const clientID = await getNextSequenceValue('clientID');
 
     // Create a new client
-    const newClient = new Client({ clientID, clientName, clientEmail, clientPhone, clientAddress, clientCat });
+    const newClient = new Client({ clientID, clientName, clientEmail, clientPhone,clientGst, clientAddress, clientCat });
     await newClient.save();
     res.status(201).send('Client created');
   } catch (err) {
@@ -92,12 +92,12 @@ exports.deleteClient = async (req, res) => {
 exports.updateClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const { clientName, clientEmail, clientPhone, clientAddress, clientCat } = req.body;
+    const { clientName, clientEmail, clientPhone,clientGst, clientAddress, clientCat } = req.body;
 
     // Update the client
     const updatedClient = await Client.findByIdAndUpdate(
       id,
-      { clientName, clientEmail, clientPhone, clientAddress, clientCat },
+      { clientName, clientEmail, clientPhone,clientGst, clientAddress, clientCat },
       { new: true }
     );
     if (!updatedClient) return res.status(404).send('Client not found');
