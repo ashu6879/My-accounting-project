@@ -120,10 +120,10 @@ const AddClient = () => {
         />
         <TextField
           label="Phone"
-          name="clientGst"
+          name="clientPhone"
           variant="outlined"
           fullWidth
-          value={clientData.clientGst}
+          value={clientData.clientPhone}
           onChange={handleChange}
           margin="normal"
           required
@@ -133,7 +133,7 @@ const AddClient = () => {
           name="clientGst"
           variant="outlined"
           fullWidth
-          value={clientData.clientPhone}
+          value={clientData.clientGST}
           onChange={handleChange}
           margin="normal"
         />

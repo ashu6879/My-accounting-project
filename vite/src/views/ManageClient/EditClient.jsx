@@ -25,6 +25,7 @@ const CategoryList = () => {
   const [updateName, setUpdateName] = useState('');
   const [updateAddress, setUpdateAddress] = useState('');
   const [updatePhone, setUpdatePhone] = useState('');
+  const [updateGST, setUpdateGST] = useState('');
   const [updateEmail, setUpdateEmail] = useState('');
   const [updateCategory, setUpdateCategory] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -71,6 +72,7 @@ const CategoryList = () => {
     setUpdateName(client.clientName);
     setUpdateAddress(client.clientAddress);
     setUpdatePhone(client.clientPhone);
+    setUpdateGST(client.clientGst);
     setUpdateEmail(client.clientEmail);
     setUpdateCategory(client.clientCat);
     setUpdateDialogOpen(true);
@@ -121,6 +123,7 @@ const CategoryList = () => {
           clientName: updateName,
           clientAddress: updateAddress,
           clientPhone: updatePhone,
+          clientGst : updateGST,
           clientEmail: updateEmail,
           clientCat: updateCategory,
         }),
@@ -132,7 +135,7 @@ const CategoryList = () => {
 
       setSuccess('Client updated successfully');
       setClients(clients.map((client) =>
-        client._id === clientToUpdate._id ? { ...client, clientName: updateName, clientAddress: updateAddress, clientPhone: updatePhone, clientEmail: updateEmail, clientCat: updateCategory } : client
+        client._id === clientToUpdate._id ? { ...client, clientName: updateName, clientAddress: updateAddress, clientPhone: updatePhone,clientGst: updateGST, clientEmail: updateEmail, clientCat: updateCategory } : client
       ));
       handleUpdateDialogClose();
     } catch (error) {
@@ -323,6 +326,13 @@ const CategoryList = () => {
             margin="normal"
             value={updatePhone}
             onChange={(e) => setUpdatePhone(e.target.value)}
+          />
+          <TextField
+            label="GST Number"
+            fullWidth
+            margin="normal"
+            value={updateGST}
+            onChange={(e) => setUpdateGST(e.target.value)}
           />
           <TextField
             label="Email"
