@@ -232,7 +232,14 @@ const EditInvoice = () => {
   if (!isAuthenticated) {
     return null;
   }
-
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+  };
   return (
     <Container maxWidth="md">
       <Typography variant="h4" gutterBottom>
@@ -284,44 +291,44 @@ const EditInvoice = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.invID}>
-                <TableCell>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {invoice.printdate}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {invoice.invNum}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {invoice.clientName}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                    {invoice.projectTitle}
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton color="primary" onClick={() => handleEdit(invoice)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(invoice)}>
-                      <Delete />
-                    </IconButton>
-                    <IconButton color="error" onClick={() => generatePDF(invoice)}>
-                      <PictureAsPdf  />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+    {invoices.map((invoice) => (
+      <TableRow key={invoice.invID}>
+        <TableCell>
+          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {formatDate(invoice.printdate)}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {invoice.invNum}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {invoice.clientName}
+          </Typography>
+        </TableCell>
+        <TableCell>
+          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {invoice.projectTitle}
+          </Typography>
+        </TableCell>
+        <TableCell align="right">
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton color="primary" onClick={() => handleEdit(invoice)}>
+              <Edit />
+            </IconButton>
+            <IconButton color="secondary" onClick={() => handleDeleteDialogOpen(invoice)}>
+              <Delete />
+            </IconButton>
+            <IconButton color="error" onClick={() => generatePDF(invoice)}>
+              <PictureAsPdf />
+            </IconButton>
+          </Box>
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
         </Table>
       </TableContainer>
 
