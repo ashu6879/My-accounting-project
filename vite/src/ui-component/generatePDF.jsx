@@ -111,6 +111,7 @@ export const generatePDF = async (invoice) => {
         doc.setFont('helvetica', 'bold');
         doc.text(`Total Amount: ${totalAmount} ${currency.currencyName}`, 10, yOffset);
         doc.text(`Currency Type: ${currency.currencyName}`, 10, yOffset + 10);
+        doc.text(`Client GST Number: ${invoice.clientGst}`, 10, yOffset + 10);
 
         // Add remarks
         doc.setFontSize(12);
