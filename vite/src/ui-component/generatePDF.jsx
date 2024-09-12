@@ -14,14 +14,16 @@ export const generatePDF = async (invoice) => {
         const invoiceData = await invoiceResponse.json();
         console.log('Invoice Data:', invoiceData);
 
-        // Fetch currencies data from API if needed
-        const currenciesResponse = await fetch(`https://ekarigar-accounts.onrender.com/currencies/${invoice.currencyID}`);
-        if (!currenciesResponse.ok) {
-            throw new Error(`Failed to fetch currencies data: ${currenciesResponse.statusText}`);
+        let currencies = invoice.currency; // Default currency
+        if (invoice.currencyID) {
+            // Fetch currencies data from API if currencyID is present
+            const currenciesResponse = await fetch(`https://ekarigar-accounts.onrender.com/currencies/${invoice.currencyID}`);
+            if (!currenciesResponse.ok) {
+                throw new Error(`Failed to fetch currencies data: ${currenciesResponse.statusText}`);
+            }
+            currencies = await currenciesResponse.json();
+            console.log(currencies.currency);
         }
-        const currencies = await currenciesResponse.json();
-        console.log(currencies);
-        const currency = currencies.find(c => c.id === invoice.currencyID) || { symbol: '$', currencyName: 'USD' };
 
         // Create a new PDF document
         const doc = new jsPDF();
@@ -38,48 +40,45 @@ export const generatePDF = async (invoice) => {
         doc.rect(0, 40, doc.internal.pageSize.width, 40, 'F'); // Draw background rectangle
 
         // Company details
-        doc.setFontSize(16);
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('Invoice', 10, 50);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Client Name: ${invoice.clientName || 'N/A'}`, 70, 50);
-        doc.text(`Project Name: ${invoice.projectTitle || 'N/A'}`, 70, 60);
+        doc.text('Invoice', 10, 55);
 
-        // Invoice number and date
+        // Add invoice number and date in one line
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Invoice Number: #${invoice.invNum}`, 10, 90);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 100);
+        doc.text(`Invoice Number: #${invoice.invNum}`, 10, 70);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 190, 70, { align: 'right' });
 
         // Client details
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Client Details', 10, 120);
+        doc.text('Client Details', 10, 90);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Address: ${invoice.clientAddress || 'N/A'}`, 10, 130, { maxWidth: 190 });
-        doc.text(`Phone: ${invoice.clientPhone || 'N/A'}`, 10, 140);
-        doc.text(`Email: ${invoice.clientEmail || 'N/A'}`, 10, 150);
+        doc.text(`Client Name: ${invoice.clientName || 'N/A'}`, 10, 105);
+        doc.text(`Address: ${invoice.clientAddress || 'N/A'}`, 10, 115, { maxWidth: 190 });
+        doc.text(`Phone: ${invoice.clientPhone || 'N/A'}`, 10, 125);
+        doc.text(`Email: ${invoice.clientEmail || 'N/A'}`, 10, 135);
 
         // Project details
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Project Details', 10, 170);
+        doc.text('Project Details', 10, 155);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Title: ${invoice.projectTitle || 'N/A'}`, 10, 180);
-        doc.text(`Serviced By: ${invoice.ServicedBy || 'N/A'}`, 10, 190);
-        doc.text(`Sale Done By: ${invoice.SaledoneBy || 'N/A'}`, 10, 200);
+        doc.text(`Title: ${invoice.projectTitle || 'N/A'}`, 10, 170);
+        doc.text(`Serviced By: ${invoice.ServicedBy || 'N/A'}`, 10, 180);
+        doc.text(`Sale Done By: ${invoice.SaledoneBy || 'N/A'}`, 10, 190);
 
         // Invoice Items header
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Invoice Items', 10, 220);
+        doc.text('Invoice Items', 10, 210);
 
         // Add table with invoice items
         doc.autoTable({
-            startY: 230,
+            startY: 220,
             head: [['Description', 'Quantity', 'Rate', 'Total']],
             body: invoiceData.map(item => [
                 item.itemDesc || 'N/A',
@@ -91,46 +90,54 @@ export const generatePDF = async (invoice) => {
             ]),
             theme: 'grid',
             headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255], fontSize: 12, fontStyle: 'bold' },
-            bodyStyles: { fontSize: 10 },
-            margin: { top: 10 },
-            styles: { cellPadding: 4, font: 'helvetica' },
+            bodyStyles: { fontSize: 10, textColor: [50, 50, 50] },
+            styles: { cellPadding: 6, font: 'helvetica', overflow: 'linebreak' },
             columnStyles: {
-                0: { cellWidth: 60 },
-                1: { cellWidth: 30 },
-                2: { cellWidth: 40 },
-                3: { cellWidth: 40 }
+                0: { cellWidth: 'auto', fontStyle: 'normal' },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 50 },
+                3: { cellWidth: 50 }
             },
+            margin: { top: 10 },
+            tableLineColor: [0, 0, 0],
+            tableLineWidth: 0.75,
+            headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255], fontStyle: 'bold' },
+            bodyStyles: { textColor: [50, 50, 50] }
         });
 
         // Add total price and currency type
         const totalAmount = invoiceData.reduce((sum, item) =>
             sum + (item.itemQty * item.itemRate), 0
         ).toFixed(2);
-        const yOffset = doc.lastAutoTable.finalY + 10;
+        const yOffset = doc.lastAutoTable.finalY + 15;
+
+        const currency = invoice.currency || currencies.currency;
 
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Total Amount: ${totalAmount} ${invoice.currency}`, 10, yOffset);
-        doc.text(`Currency Type: ${currency.currencyName}`, 10, yOffset + 10);
-        doc.text(`Client GST Number: ${invoice.clientGst}`, 10, yOffset + 10);
+        doc.text(`Total Amount: ${totalAmount} ${currency}`, 10, yOffset);
+        doc.text(`Client GST Number: ${invoice.clientGst || 'N/A'}`, 10, yOffset + 20);
 
         // Add remarks
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Remarks: ${invoice.remarks || 'N/A'}`, 10, yOffset + 30);
+        doc.text(`Remarks: ${invoice.remarks || 'N/A'}`, 10, yOffset + 35);
 
         // Add additional information
-        doc.text(`Approved By: ${invoice.ApprovedBy || 'N/A'}`, 10, yOffset + 40);
-        doc.text(`Progress By: ${invoice.ProgressBy || 'N/A'}`, 10, yOffset + 50);
+        doc.text(`Approved By: ${invoice.ApprovedBy || 'N/A'}`, 10, yOffset + 50);
+        doc.text(`Progress By: ${invoice.ProgressBy || 'N/A'}`, 10, yOffset + 65);
 
         // Add footer
         doc.setFontSize(10);
         doc.setFont('helvetica', 'italic');
-        doc.text('Thank you for your business!', 10, doc.internal.pageSize.height - 10);
+        doc.text('Thank you for your business!', 190, doc.internal.pageSize.height - 10, { align: 'right' });
 
         // Save the PDF
         doc.save(`${invoice.invNum}.pdf`);
+
+
     } catch (error) {
         console.error('Error generating PDF:', error);
     }
 };
+
