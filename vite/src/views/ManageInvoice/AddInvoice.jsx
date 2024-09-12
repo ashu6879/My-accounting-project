@@ -26,31 +26,34 @@ const GenerateInvoice = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const [newCurrency, setNewCurrency] = useState('');
   const navigate = useNavigate();
 
+  const fetchClients = async () => {
+    try {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clients');
+      const data = await response.json();
+      setClients(data);
+    } catch (error) {
+      setError('Failed to fetch clients');
+    }
+  };
+  
+  const fetchCurrencies = async () => {
+    try {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/currencies');
+      const data = await response.json();
+      setCurrencies(data);
+    } catch (error) {
+      setError('Failed to fetch currencies');
+    }
+  };
+  
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('https://ekarigar-accounts.onrender.com/clients');
-        const data = await response.json();
-        setClients(data);
-      } catch (error) {
-        setError('Failed to fetch clients');
-      }
-    };
-    const fetchCurrencies = async () => {
-      try {
-        const response = await fetch('https://ekarigar-accounts.onrender.com/currencies');
-        const data = await response.json();
-        setCurrencies(data);
-      } catch (error) {
-        setError('Failed to fetch currencies');
-      }
-    };
-
     fetchClients();
     fetchCurrencies();
   }, []);
+  
 
   const handleClientChange = async (event) => {
     const clientID = event.target.value;
@@ -95,17 +98,36 @@ const GenerateInvoice = () => {
 
   const handleItemChange = (index, event) => {
     const { name, value } = event.target;
-    const newItems = [...invoiceItems];
-    newItems[index] = { ...newItems[index], [name]: value };
-    setInvoiceItems(newItems);
+    setInvoiceItems(prevItems => {
+      const newItems = [...prevItems];
+      newItems[index] = { ...newItems[index], [name]: value };
+      return newItems;
+    });
   };
-  const handleCurrencyChange = (event) => {
-    const currencyID = event.target.value;
-    setInvoiceData(prevData => ({
-      ...prevData,
-      currencyID, // Update state with selected currency ID
-    }));
+  
+
+  const handleAddCurrency = async () => {
+    try {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/currencies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currency: newCurrency }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to add currency');
+      }
+  
+      setSuccess('Currency added successfully');
+      setNewCurrency('');
+      await fetchCurrencies(); // Ensure fetchCurrencies is available in scope
+    } catch (error) {
+      setError(error.message);
+    }
   };
+
 
   const addItem = () => {
     setInvoiceItems(prevItems => [
@@ -130,86 +152,90 @@ const GenerateInvoice = () => {
     };
 
     try {
-        // Create the invoice
-        const createResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(postData),
+      // Create the invoice
+      const createResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!createResponse.ok) {
+        const errorMessage = await createResponse.text();
+        throw new Error(errorMessage || 'Failed to generate invoice');
+      }
+
+      // Fetch the latest invoice ID
+      const invoicesResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices');
+      if (!invoicesResponse.ok) {
+        const errorMessage = await invoicesResponse.text();
+        throw new Error(errorMessage || 'Failed to fetch invoices');
+      }
+
+      const invoices = await invoicesResponse.json();
+      if (invoices.length === 0) {
+        throw new Error('No invoices found after creation');
+      }
+
+      // Assume invoices are sorted by creation date or ID in descending order
+      const latestInvoice = invoices[0]; // Adjust as necessary based on your data
+      const invID = latestInvoice.invID;
+
+      if (!invID) {
+        throw new Error('Invoice ID is null or undefined');
+      }
+
+      // Send invoice items
+      await Promise.all(invoiceItems.map(async (item) => {
+        if (!item || !item.itemDesc || item.itemQty === undefined || item.itemRate === undefined) {
+          throw new Error('Invalid invoice item data');
+        }
+
+        const itemResponse = await fetch('https://ekarigar-accounts.onrender.com/invoiceItem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...item,
+            invID, // Use the fetched invoice ID
+          }),
         });
 
-        if (!createResponse.ok) {
-            const errorMessage = await createResponse.text();
-            throw new Error(errorMessage || 'Failed to generate invoice');
+        if (!itemResponse.ok) {
+          const errorMessage = await itemResponse.text();
+          throw new Error(errorMessage || 'Failed to add invoice item');
         }
+      }));
 
-        // Fetch the latest invoice ID
-        const invoicesResponse = await fetch('https://ekarigar-accounts.onrender.com/invoices');
-        if (!invoicesResponse.ok) {
-            const errorMessage = await invoicesResponse.text();
-            throw new Error(errorMessage || 'Failed to fetch invoices');
-        }
-
-        const invoices = await invoicesResponse.json();
-        if (invoices.length === 0) {
-            throw new Error('No invoices found after creation');
-        }
-
-        // Assume invoices are sorted by creation date or ID in descending order
-        const latestInvoice = invoices[0]; // Adjust as necessary based on your data
-        const invID = latestInvoice.invID;
-
-        if (!invID) {
-            throw new Error('Invoice ID is null or undefined');
-        }
-
-        // Send invoice items
-        await Promise.all(invoiceItems.map(async (item) => {
-            if (!item || !item.itemDesc || item.itemQty === undefined || item.itemRate === undefined) {
-                throw new Error('Invalid invoice item data');
-            }
-
-            const itemResponse = await fetch('https://ekarigar-accounts.onrender.com/invoiceItem', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...item,
-                    invID, // Use the fetched invoice ID
-                }),
-            });
-
-            if (!itemResponse.ok) {
-                const errorMessage = await itemResponse.text();
-                throw new Error(errorMessage || 'Failed to add invoice item');
-            }
-        }));
-
-        setSuccess('Invoice generated successfully!');
-        setInvoiceData({
-            clientID: '',
-            projectID: '',
-            currencyID: '', // Reset currency
-            remarks: '',
-        });
+      setSuccess('Invoice generated successfully!');
+      setInvoiceData({
+        clientID: '',
+        projectID: '',
+        currencyID: '', // Reset currency
+        remarks: '',
+      });
 
 
-        setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
-        setProjects([]);
-        setSelectedClient(null);
-        setSelectedProject(null);
+      setInvoiceItems([{ invID: 1, itemDesc: '', itemQty: 0, itemRate: 0 }]);
+      setProjects([]);
+      setSelectedClient(null);
+      setSelectedProject(null);
 
-        setTimeout(() => {
-          navigate('/ManageInvoice/edit');
-        }, 2000);
+      setTimeout(() => {
+        navigate('/ManageInvoice/edit');
+      }, 2000);
     } catch (error) {
-        setError(error.message);
+      setError(error.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
+
+  const handleCurrencyChange = (e) => {
+    setInvoiceData({ ...invoiceData, newCurrency: e.target.value });
+  };
 
 
   if (authLoading) {
@@ -271,75 +297,107 @@ const GenerateInvoice = () => {
               </Grid>
             </Grid>
           </Grid>
+
           {/* Currency Selection */}
           <Grid item xs={12}>
-            <FormControl variant="outlined" fullWidth required>
-              <InputLabel id="currency-label">Select Currency</InputLabel>
-              <Select
-                labelId="currency-label"
-                id="currency"
-                name="currency"
-                value={invoiceData.currencyID}
-                onChange={handleCurrencyChange}
-                label="Select Currency"
-              >
-                {currencies.map(currency => (
-                  <MenuItem key={currency.currencyID} value={currency.currencyID}>
-                    {currency.currency}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={8}>
+                <FormControl variant="outlined" fullWidth required>
+                  <InputLabel id="currency-label">Select Currency</InputLabel>
+                  <Select
+                    labelId="currency-label"
+                    id="currency"
+                    name="currency"
+                    value={invoiceData.currencyID}
+                    onChange={handleCurrencyChange}
+                    label="Select Currency"
+                  >
+                    {currencies.map(currency => (
+                      <MenuItem key={currency.currencyID} value={currency.currencyID}>
+                        {currency.currency}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4} container spacing={2} alignItems="center">
+                <Grid item xs={8}>
+                  <TextField
+                    label="Add New Currency"
+                    variant="outlined"
+                    fullWidth
+                    value={newCurrency}
+                    onChange={(event) => setNewCurrency(event.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddCurrency}
+                    fullWidth
+                  >
+                    Add
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
-            {selectedClient && (
-              <Grid item xs={6}>
-                <Typography variant="h6" gutterBottom>
-                  Client Details
+
+          {/* Client and Project Details */}
+          {selectedClient && (
+            <Grid item xs={12} sm={6}>
+              <Typography variant="h6" gutterBottom>
+                Client Details
+              </Typography>
+              <Box mb={2}>
+                <Typography variant="subtitle1">
+                  Client Name: {selectedClient.clientName}
                 </Typography>
-                <Box mb={2}>
-                  <Typography variant="subtitle1">
-                    Client Name: {selectedClient.clientName}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Client Email: {selectedClient.clientEmail}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Client Address: {selectedClient.clientAddress}
-                  </Typography>
-                </Box>
-              </Grid>
-            )}
-            {selectedProject && (
-              <Grid item xs={6}>
-                <Typography variant="h6" gutterBottom>
-                  Project Details
+                <Typography variant="subtitle1">
+                  Client Email: {selectedClient.clientEmail}
                 </Typography>
-                <Box mb={2}>
-                  <Typography variant="subtitle1">
-                    Project Title: {selectedProject.projectTitle}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Serviced By: {selectedProject.ServicedBy}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Sale done By: {selectedProject.SaledoneBy}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Approved By: {selectedProject.ApprovedBy}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Progress By: {selectedProject.ProgressBy}
-                  </Typography>
-                </Box>
-              </Grid>
-            )}
+                <Typography variant="subtitle1">
+                  Client Address: {selectedClient.clientAddress}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+          {selectedProject && (
+            <Grid item xs={12} sm={6}>
+              <Typography variant="h6" gutterBottom>
+                Project Details
+              </Typography>
+              <Box mb={2}>
+                <Typography variant="subtitle1">
+                  Project Title: {selectedProject.projectTitle}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Serviced By: {selectedProject.ServicedBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Sale done By: {selectedProject.SaledoneBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Approved By: {selectedProject.ApprovedBy}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Progress By: {selectedProject.ProgressBy}
+                </Typography>
+              </Box>
+            </Grid>
+          )}
 
           {/* Invoice Items */}
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom>
               Invoice Items
             </Typography>
-            <Button variant="outlined" color="primary" onClick={addItem}>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={addItem}
+            >
               Add Item
             </Button>
             {invoiceItems.map((item, index) => (
@@ -383,14 +441,12 @@ const GenerateInvoice = () => {
                       color="secondary"
                       onClick={() => removeItem(index)}
                       startIcon={<DeleteIcon />}
-                    >
-                    </Button>
+                    />
                   </Grid>
                 </Grid>
               </Box>
             ))}
           </Grid>
-          
 
           {/* Remarks */}
           <Grid item xs={12}>
@@ -422,20 +478,16 @@ const GenerateInvoice = () => {
       </form>
 
       {/* Success/Error Messages */}
-      {success && (
-        <Snackbar open autoHideDuration={6000} onClose={() => setSuccess('')}>
-          <Alert onClose={() => setSuccess('')} severity="success">
-            {success}
-          </Alert>
-        </Snackbar>
-      )}
-      {error && (
-        <Snackbar open autoHideDuration={6000} onClose={() => setError('')}>
-          <Alert onClose={() => setError('')} severity="error">
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
+      <Snackbar open={!!success} autoHideDuration={6000} onClose={() => setSuccess('')}>
+        <Alert onClose={() => setSuccess('')} severity="success">
+          {success}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')}>
+        <Alert onClose={() => setError('')} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
