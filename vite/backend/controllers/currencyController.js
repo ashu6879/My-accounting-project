@@ -12,7 +12,7 @@ exports.addCurrency = async (req, res) => {
 
     // Get the next currencyID from the counter
     const counter = await Counter.findByIdAndUpdate(
-      { _id: 'currency' },
+      { _id: 'currencyID' },
       { $inc: { sequence_value: 1 } },
       { new: true, upsert: true }
     );
