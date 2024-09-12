@@ -4,10 +4,10 @@ const Counter = require('../models/counter');
 // Add Currency
 exports.addCurrency = async (req, res) => {
   try {
-    const { currencyName } = req.body;
+    const { currency } = req.body;
 
     // Check if the currency already exists
-    const existingCurrency = await Currency.findOne({ currencyName });
+    const existingCurrency = await Currency.findOne({ currency });
     if (existingCurrency) return res.status(400).send('Currency already exists');
 
     // Get the next currencyID from the counter
@@ -20,7 +20,7 @@ exports.addCurrency = async (req, res) => {
     // Create a new currency with the incremented currencyID
     const newCurrency = new Currency({
       currencyID: counter.sequence_value,
-      currencyName,
+      currency,
     });
 
     await newCurrency.save();
@@ -65,8 +65,8 @@ exports.deleteCurrency = async (req, res) => {
 exports.updateCurrency = async (req, res) => {
   try {
     const { id } = req.params;
-    const { currencyName } = req.body;
-    const updatedCurrency = await Currency.findByIdAndUpdate(id, { currencyName }, { new: true });
+    const { currency } = req.body;
+    const updatedCurrency = await Currency.findByIdAndUpdate(id, { currency }, { new: true });
     if (!updatedCurrency) return res.status(404).send('Currency not found');
     res.json(updatedCurrency);
   } catch (err) {
