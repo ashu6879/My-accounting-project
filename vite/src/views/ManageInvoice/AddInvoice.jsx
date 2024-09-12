@@ -279,13 +279,13 @@ const GenerateInvoice = () => {
                 labelId="currency-label"
                 id="currency"
                 name="currency"
-                value={invoiceData.currencyName}
+                value={invoiceData.currencyID}
                 onChange={handleCurrencyChange}
                 label="Select Currency"
               >
                 {currencies.map(currency => (
                   <MenuItem key={currency.currencyID} value={currency.currencyID}>
-                    {currency.currencyName}
+                    {currency.currency}
                   </MenuItem>
                 ))}
               </Select>

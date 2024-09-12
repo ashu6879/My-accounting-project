@@ -1,7 +1,6 @@
 const Invoice = require('../models/invoice');
 const Client = require('../models/client');
 const Project = require('../models/project');
-const InvoiceItem = require('../models/invoiceItem');
 const currency = require('../models/currency');
 const Counter = require('../models/counter'); // Import the Counter model for generating unique IDs
 

@@ -19,8 +19,8 @@ const initializeCounters = async () => {
       { _id: 'clientID', initial_value: 275 },
       { _id: 'invID', initial_value: 1698 },  // Added for invID initialization
       { _id: 'invNum', initial_value: 12312300213 },  // Added for invNum initialization
-      { _id: 'invtID', initial_value: 4784 },  // Added for invtID initialization
-      { _id: 'currencyID', initial_value: 0 }  // Added for invtID initialization
+      { _id: 'invtID', initial_value: 4776 },  // Added for invtID initialization
+      { _id: 'currencyID', initial_value: 3 }  // Added for invtID initialization
     ];
 
     // Loop through each counter definition
