@@ -13,13 +13,13 @@ const initializeCounters = async () => {
   try {
     // Define initial values for each counter
     const counters = [
-      { _id: 'clientCategory', initial_value: 77 },
-      { _id: 'projectCategory', initial_value: 74 },
-      { _id: 'projectID', initial_value: 134 },
-      { _id: 'clientID', initial_value: 118 },
-      { _id: 'invID', initial_value: 288 },  // Added for invID initialization
+      { _id: 'clientCategory', initial_value: 78 },
+      { _id: 'projectCategory', initial_value: 80 },
+      { _id: 'projectID', initial_value: 370 },
+      { _id: 'clientID', initial_value: 275 },
+      { _id: 'invID', initial_value: 1698 },  // Added for invID initialization
       { _id: 'invNum', initial_value: 12312300194 },  // Added for invNum initialization
-      { _id: 'invtID', initial_value: 1065 },  // Added for invtID initialization
+      { _id: 'invtID', initial_value: 4784 },  // Added for invtID initialization
       { _id: 'currencyID', initial_value: 1 }  // Added for invtID initialization
     ];
 
