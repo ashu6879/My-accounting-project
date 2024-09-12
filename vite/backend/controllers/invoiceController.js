@@ -45,7 +45,7 @@ exports.addInvoice = async (req, res) => {
       projectID,
       invNum, // Set the auto-incremented invNum
       remarks,
-      currencyID,
+      currency,
       invDate: autoFilledInvDate, // Autofilled or provided invDate
       printdate: autoFilledPrintDate // Autofilled or provided printdate
     });
@@ -108,7 +108,7 @@ exports.getInvoices = async (req, res) => {
           remarks: 1,
           invDate: 1,
           printdate: 1,
-          currencyID: 1,
+          currency: 1,
           clientName: { $ifNull: ['$clientDetails.clientName', null] },
           clientEmail: { $ifNull: ['$clientDetails.clientEmail', null] },
           clientPhone: { $ifNull: ['$clientDetails.clientPhone', null] },
@@ -177,6 +177,7 @@ exports.getInvoiceById = async (req, res) => {
           remarks: 1,
           invDate: 1,
           printdate: 1,
+          currency :1,
           clientName: { $ifNull: ['$clientDetails.clientName', null] },
           clientEmail: { $ifNull: ['$clientDetails.clientEmail', null] },
           clientPhone: { $ifNull: ['$clientDetails.clientPhone', null] },
