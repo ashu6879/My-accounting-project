@@ -15,11 +15,12 @@ export const generatePDF = async (invoice) => {
         console.log('Invoice Data:', invoiceData);
 
         // Fetch currencies data from API if needed
-        const currenciesResponse = await fetch('https://ekarigar-accounts.onrender.com/currencies');
+        const currenciesResponse = await fetch(`https://ekarigar-accounts.onrender.com/currencies/${invoice.currencyID}`);
         if (!currenciesResponse.ok) {
             throw new Error(`Failed to fetch currencies data: ${currenciesResponse.statusText}`);
         }
         const currencies = await currenciesResponse.json();
+        console.log(currencies);
         const currency = currencies.find(c => c.id === invoice.currencyID) || { symbol: '$', currencyName: 'USD' };
 
         // Create a new PDF document
@@ -109,7 +110,7 @@ export const generatePDF = async (invoice) => {
 
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Total Amount: ${totalAmount} ${currency.currencyName}`, 10, yOffset);
+        doc.text(`Total Amount: ${totalAmount} ${invoice.currency}`, 10, yOffset);
         doc.text(`Currency Type: ${currency.currencyName}`, 10, yOffset + 10);
         doc.text(`Client GST Number: ${invoice.clientGst}`, 10, yOffset + 10);
 

@@ -61,6 +61,7 @@ router.get('/getInvoiceItemByInvID/:invID', invoiceItemController.getInvoiceItem
 
 router.post('/currencies', currencyController.addCurrency);
 router.get('/currencies', currencyController.getCurrency);
+router.get('/currencies/:currencyID', currencyController.getCurrencyByID);
 router.delete('/currencies/:id', currencyController.deleteCurrency);
 router.put('/currencies/:id', currencyController.updateCurrency);
 

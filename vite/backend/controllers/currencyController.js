@@ -48,6 +48,31 @@ exports.getCurrency = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+// Get Currency by currencyID
+exports.getCurrencyByID = async (req, res) => {
+  try {
+    let { currencyID } = req.params;
+
+    // Convert currencyID to a number if necessary
+    currencyID = Number(currencyID);
+
+    // Check if the currencyID is a valid number
+    if (isNaN(currencyID)) {
+      return res.status(400).send('Invalid currencyID');
+    }
+
+    // Fetch the currency by its unique currencyID
+    const currency = await Currency.findOne({ currencyID });
+
+    if (!currency) return res.status(404).send('Currency not found');
+
+    res.json(currency);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+};
+
 
 // Delete Currency
 exports.deleteCurrency = async (req, res) => {
