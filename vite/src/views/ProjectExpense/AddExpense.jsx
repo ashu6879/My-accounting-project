@@ -188,7 +188,6 @@ const AddExpense = () => {
                                                 onClick={() => removeItem(index)}
                                                 startIcon={<DeleteIcon />}
                                             >
-                                                Remove
                                             </Button>
                                         </Box>
                                     </Grid>

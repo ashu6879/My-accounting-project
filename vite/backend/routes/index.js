@@ -68,6 +68,7 @@ router.put('/currencies/:id', currencyController.updateCurrency);
 
 router.post('/Expense', expenseController.addExpense);
 router.get('/Expense', expenseController.getExpense);
+router.get('/Expense/:projectID', expenseController.getExpenseById);
 router.delete('/Expense/:id', expenseController.deleteExpense);
 router.put('/Expense/:id', expenseController.updateExpense);
 

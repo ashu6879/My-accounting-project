@@ -33,18 +33,32 @@ exports.getExpense = async (req, res) => {
   }
 };
 
-// Get a single invoice item by ID
+// Get a single expense item by ID
 exports.getExpenseById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const expense = await projectexpenses.findById(id);
-    if (!expense) return res.status(404).send('Expense not found');
-    res.status(200).json(expense);
+    let { projectID } = req.params;
+
+    // Convert projectID to a number if necessary
+    projectID = Number(projectID);
+
+    // Check if the projectID is a valid number
+    if (isNaN(projectID)) {
+      return res.status(400).send('Invalid projectID');
+    }
+
+    // Fetch all expenses associated with the projectID
+    const expenses = await projectexpenses.find({ projectID });
+
+    if (expenses.length === 0) return res.status(404).send('No expenses found for this projectID');
+
+    res.json(expenses);
   } catch (error) {
-    console.error('Error fetching expense:', error);
+    console.error(error);
     res.status(500).send('Server Error');
   }
 };
+
+
 
 // Update an invoice item by ID
 exports.updateExpense = async (req, res) => {
