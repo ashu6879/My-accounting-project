@@ -2,23 +2,18 @@ import { useState, useRef, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
-import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
@@ -35,7 +30,7 @@ import UpgradePlanCard from './UpgradePlanCard';
 import User1 from 'assets/images/users/user-round.svg';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons-react';
+import { IconLogout, IconSquareRoundedPlusFilled, IconSettings } from '@tabler/icons-react';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -56,11 +51,11 @@ const ProfileSection = () => {
   const handleLogout = async () => {
     // Clear all data from localStorage
     localStorage.clear();
-    
+
     // Optionally, you can navigate to a different page after logout
     navigate('/'); // Replace '/login' with the path you want to navigate to after logout
   };
-  
+
 
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
@@ -175,17 +170,25 @@ const ProfileSection = () => {
                         }}
                       >
                         <ListItemButton
-                        sx={{ borderRadius: `${customization.borderRadius}px` }}
-                        selected={selectedIndex === 4}
-                        onClick={handleLogout}
-                      >
-                        <ListItemIcon>
-                          <IconLogout stroke={1.5} size="1.3rem" />
-                        </ListItemIcon>
-                        <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
-                      </ListItemButton>
+                          sx={{ borderRadius: `${customization.borderRadius}px` }}
+                          selected={selectedIndex === 4}
+                          onClick={handleLogout}
+                        >
+                          <ListItemIcon>
+                            <IconLogout stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                        </ListItemButton>
+                        <ListItemButton component={Link} to="/pages/register/register3" sx={{ borderRadius: `${customization.borderRadius}px`, mt: 1 }}>
+                          <ListItemIcon>
+                            <IconSquareRoundedPlusFilled stroke={1.5} size="1.3rem" sx={{ mr: 2 }} /> {/* Adjust the spacing here */}
+                          </ListItemIcon>
+                          <ListItemText primary={<Typography variant="body2">Add an account?</Typography>} />
+                        </ListItemButton>
+
                       </List>
                     </Box>
+
                   </PerfectScrollbar>
                 </MainCard>
               </ClickAwayListener>
