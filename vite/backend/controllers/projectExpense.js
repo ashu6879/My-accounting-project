@@ -1,14 +1,13 @@
-const InvoiceItem = require('../models/Expense');
-const Counter = require('../models/counter');
+const projectexpenses = require('../models/Expense'); // Ensure model is correctly imported
 
 // Add a new invoice item
 exports.addExpense = async (req, res) => {
   try {
-    const {projectID,amount,description,expDate} = req.body;
+    const { projectID, amount, description, expDate } = req.body;
 
     // Create new expense
-    const newItem = new InvoiceItem({
-      projectID, // Use the auto-incremented invtID
+    const newItem = new projectexpenses({
+      projectID, // Use the auto-incremented invtID if applicable
       amount,
       description,
       expDate, // Add totalRate field
@@ -17,15 +16,16 @@ exports.addExpense = async (req, res) => {
     await newItem.save();
     res.status(201).json(newItem);
   } catch (error) {
-    console.error('Error creating expense :', error);
+    console.error('Error creating expense:', error);
     res.status(500).send('Error creating expense');
   }
 };
 
+// Get all invoice items
 exports.getExpense = async (req, res) => {
   try {
     const expenses = await projectexpenses.find()
-      .sort({ _id: -1 }); // Removed the semicolon here
+      .sort({ _id: -1 });
     res.status(200).json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -37,11 +37,11 @@ exports.getExpense = async (req, res) => {
 exports.getExpenseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const expenses = await projectexpenses.findById(id);
-    if (!item) return res.status(404).send('Invoice item not found');
-    res.status(200).json(expenses);
+    const expense = await projectexpenses.findById(id);
+    if (!expense) return res.status(404).send('Expense not found');
+    res.status(200).json(expense);
   } catch (error) {
-    console.error('Error fetching expenses:', error);
+    console.error('Error fetching expense:', error);
     res.status(500).send('Server Error');
   }
 };
@@ -52,9 +52,9 @@ exports.updateExpense = async (req, res) => {
     const { id } = req.params;
     const { projectID, amount, description } = req.body;
 
-    const updatedItem = await projectexpenses.findOneAndUpdate(
-      { id },
-      { projectID, amount, description},
+    const updatedItem = await projectexpenses.findByIdAndUpdate(
+      id,
+      { projectID, amount, description },
       { new: true, runValidators: true }
     );
     
@@ -64,29 +64,27 @@ exports.updateExpense = async (req, res) => {
     
     res.status(200).json(updatedItem);
   } catch (error) {
-    console.error('Error updating Expense:', error);
-    res.status(500).send('Error updating Expense');
+    console.error('Error updating expense:', error);
+    res.status(500).send('Error updating expense');
   }
 };
 
-
-// Delete an invoice item by invtID
+// Delete an invoice item by ID
 exports.deleteExpense = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Ensure invtID is a number
-    const numericInvtID = Number(id);
-    if (isNaN(numericInvtID)) {
+    // Ensure id is a valid MongoDB ObjectId
+    if (!id) {
       return res.status(400).send('Invalid id format');
     }
 
-    const result = await projectexpenses.findOneAndDelete({ id: numericInvtID });
-    if (!result) return res.status(404).send('Expensenot found');
+    const result = await projectexpenses.findByIdAndDelete(id);
+    if (!result) return res.status(404).send('Expense not found');
     
-    res.status(200).send('Expense  deleted');
+    res.status(200).send('Expense deleted');
   } catch (error) {
-    console.error('Error deleting Expense:', error);
-    res.status(500).send('Error deleting Expense');
+    console.error('Error deleting expense:', error);
+    res.status(500).send('Error deleting expense');
   }
 };

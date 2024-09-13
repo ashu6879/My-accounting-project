@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl, Grid
+    Box, Button, TextField, Container, Typography, Snackbar, Alert, MenuItem, Select, InputLabel, FormControl, Grid
 } from '@mui/material';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
 
 const AddExpense = () => {
     const [projects, setProjects] = useState([]);
+    const [invoiceItems, setInvoiceItems] = useState([{ description: '', amount: 0 }]);
     const [expenseData, setExpenseData] = useState({
         projectID: '',
         description: '',
@@ -40,12 +42,15 @@ const AddExpense = () => {
         }));
     };
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setExpenseData(prevData => ({
-            ...prevData,
-            [name]: value
-        }));
+    const addItem = () => {
+        setInvoiceItems(prevItems => [
+            ...prevItems,
+            { invID: prevItems.length + 1, description: '', amount: 0 }
+        ]);
+    };
+
+    const removeItem = (index) => {
+        setInvoiceItems(prevItems => prevItems.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
@@ -118,34 +123,58 @@ const AddExpense = () => {
                         </FormControl>
                     </Grid>
 
-                    {/* Expense Description and Amount on the same line */}
-                    <Grid container item xs={12} spacing={3}>
-                        <Grid item xs={12} sm={9}>
-                            <TextField
-                                label="Expense Description"
-                                variant="outlined"
-                                fullWidth
-                                name="description"
-                                value={expenseData.description}
-                                onChange={handleChange}
-                                required
-                            />
-                        </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="h6" gutterBottom>
+                            {/* Add any title or heading if needed */}
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={addItem}
+                        >
+                            Add Item
+                        </Button>
+                        {invoiceItems.map((item, index) => (
+                            <Box key={index} mt={2}>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={12} sm={8}>
+                                        <TextField
+                                            label="Description"
+                                            name="itemDesc"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={item.itemDesc}
+                                            onChange={(event) => handleSubmit(index, event)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={2}>
+                                        <TextField
+                                            type="number"
+                                            label="Rate"
+                                            name="itemRate"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={item.itemRate}
+                                            onChange={(event) => handleSubmit(index, event)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={2}>
+                                        <Box display="flex" justifyContent="center" >
+                                            <Button
+                                                variant="outlined"
+                                                color="secondary"
+                                                onClick={() => removeItem(index)}
+                                                startIcon={<DeleteIcon />}alignItems="center"
+                                            >
+                                            </Button>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Box>
 
-                        <Grid item xs={12} sm={3}>
-                            <TextField
-                                label="Amount"
-                                variant="outlined"
-                                fullWidth
-                                name="amount"
-                                value={expenseData.amount}
-                                onChange={handleChange}
-                                type="number"
-                                required
-                            />
-                        </Grid>
+
+                        ))}
                     </Grid>
-
                     {/* Submit Button */}
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" type="submit" fullWidth disabled={loading}>
@@ -171,6 +200,7 @@ const AddExpense = () => {
                 </Snackbar>
             )}
         </Container>
+
     );
 };
 
