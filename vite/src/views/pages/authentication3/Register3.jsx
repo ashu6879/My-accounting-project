@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth'; // Make sure to import your custom hook
+import { Link } from 'react-router-dom';
 
 // material-ui
 import Divider from '@mui/material/Divider';

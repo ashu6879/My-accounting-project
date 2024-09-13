@@ -48,9 +48,6 @@ const AuthRegister = ({ ...others }) => {
   const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate('/pages/dashboard'); // Redirect to dashboard or any page if already authenticated
-    }
   }, [isAuthenticated, loading, navigate]);
 
   const handleClickShowPassword = () => {
