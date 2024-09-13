@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import useAuth from '../../../../hooks/useAuth'; // Import your custom hook
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -42,6 +43,15 @@ const AuthRegister = ({ ...others }) => {
   const [strength, setStrength] = useState(0);
   const [level, setLevel] = useState();
   const navigate = useNavigate();
+
+  // Use the custom hook
+  const { isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate('/pages/dashboard'); // Redirect to dashboard or any page if already authenticated
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -87,6 +97,10 @@ const AuthRegister = ({ ...others }) => {
       setSubmitting(false);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a loader component
+  }
 
   return (
     <>
@@ -238,5 +252,3 @@ const AuthRegister = ({ ...others }) => {
 };
 
 export default AuthRegister;
-
-// 1234@shu

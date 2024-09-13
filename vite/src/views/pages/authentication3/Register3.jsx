@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../../hooks/useAuth'; // Make sure to import your custom hook
 
 // material-ui
 import Divider from '@mui/material/Divider';
@@ -14,12 +16,23 @@ import Logo from 'ui-component/Logo';
 import AuthRegister from '../authentication/auth-forms/AuthRegister';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 
-// assets
-
 // ===============================|| AUTH3 - REGISTER ||=============================== //
 
 const Register = () => {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    if (loading) return; // Show a loader or nothing while checking auth status
+    if (!isAuthenticated) {
+      navigate('/'); // Redirect if not authenticated
+    }
+  }, [isAuthenticated, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a loader component
+  }
 
   return (
     <AuthWrapper1>
