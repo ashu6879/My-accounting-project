@@ -234,7 +234,11 @@ const GenerateInvoice = () => {
   };
 
   const handleCurrencyChange = (e) => {
-    setInvoiceData({ ...invoiceData, newCurrency: e.target.value });
+    const selectedCurrencyID = e.target.value;
+    setInvoiceData(prevData => ({
+      ...prevData,
+      currencyID: selectedCurrencyID // Correctly update currencyID in invoiceData
+    }));
   };
 
 

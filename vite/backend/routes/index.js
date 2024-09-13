@@ -7,6 +7,7 @@ const projectController = require('../controllers/projectController');
 const invoiceController = require('../controllers/invoiceController');
 const invoiceItemController = require('../controllers/invoiceItemController');
 const currencyController = require('../controllers/currencyController');
+const expenseController = require('../controllers/projectExpense');
 
 const router = express.Router();
 
@@ -64,5 +65,10 @@ router.get('/currencies', currencyController.getCurrency);
 router.get('/currencies/:currencyID', currencyController.getCurrencyByID);
 router.delete('/currencies/:id', currencyController.deleteCurrency);
 router.put('/currencies/:id', currencyController.updateCurrency);
+
+router.post('/Expense', expenseController.addExpense);
+router.get('/Expense', expenseController.getExpense);
+router.delete('/Expense/:id', expenseController.deleteExpense);
+router.put('/Expense/:id', expenseController.updateExpense);
 
 module.exports = router;
