@@ -4,15 +4,15 @@ import {
 } from '@mui/material';
 import useAuth from 'hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const AddExpense = () => {
     const [projects, setProjects] = useState([]);
-    const [invoiceItems, setInvoiceItems] = useState([{ description: '', amount: 0 }]);
+    const [expenseItems, setExpenseItems] = useState([{ description: '', amount: 0 }]);
     const [expenseData, setExpenseData] = useState({
         projectID: '',
         description: '',
-        amount: '',
+        amount: 0,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -21,7 +21,6 @@ const AddExpense = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Uncomment and implement the following functions
         fetchProjects();
     }, []);
 
@@ -34,6 +33,7 @@ const AddExpense = () => {
             setError('Failed to fetch projects');
         }
     };
+
     const handleProjectChange = (event) => {
         const projectID = event.target.value;
         setExpenseData(prevData => ({
@@ -42,51 +42,77 @@ const AddExpense = () => {
         }));
     };
 
+    const handleItemChange = (index, event) => {
+        const { name, value } = event.target;
+        setExpenseItems(prevItems => {
+            const newItems = [...prevItems];
+            newItems[index] = { ...newItems[index], [name]: value };
+            return newItems;
+        });
+    };
+
     const addItem = () => {
-        setInvoiceItems(prevItems => [
+        setExpenseItems(prevItems => [
             ...prevItems,
-            { invID: prevItems.length + 1, description: '', amount: 0 }
+            { description: '', amount: 0 } // Ensure the new item has default values
         ]);
     };
 
     const removeItem = (index) => {
-        setInvoiceItems(prevItems => prevItems.filter((_, i) => i !== index));
+        setExpenseItems(prevItems => prevItems.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        try {
-            const response = await fetch('https://ekarigar-accounts.onrender.com/Expense', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(expenseData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add expense');
-            }
-
-            setSuccess('Expense added successfully!');
-            setExpenseData({
-                projectID: '',
-                description: '',
-                amount: '',
-            });
-
-            setTimeout(() => {
-                navigate('/ProjectExpense/edit');
-            }, 2000);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
+      
+        // Validate fields
+        if (!expenseData.projectID || expenseItems.some(item => !item.description || item.amount <= 0)) {
+          setError('Please fill out all required fields.');
+          setLoading(false);
+          return;
         }
-    };
-
+      
+        try {
+          // Send each expense item separately
+          const responses = await Promise.all(expenseItems.map(async (item) => {
+            const response = await fetch('https://ekarigar-accounts.onrender.com/Expense', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                projectID: expenseData.projectID,
+                description: item.description,
+                amount: item.amount,
+              }),
+            });
+      
+            if (!response.ok) {
+              throw new Error('Failed to add expense item');
+            }
+      
+            return response.json();
+          }));
+      
+          setSuccess('Expense items added successfully!');
+          setExpenseData({
+            projectID: '',
+            description: '',
+            amount: '',
+          });
+          setExpenseItems([{ description: '', amount: 0 }]);
+      
+          setTimeout(() => {
+            navigate('/ProjectExpense/edit');
+          }, 2000);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+   
     if (authLoading) {
         return <div>Loading...</div>;
     }
@@ -102,7 +128,6 @@ const AddExpense = () => {
             </Typography>
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-                    {/* Project Selection */}
                     <Grid item xs={12} sm={6}>
                         <FormControl variant="outlined" fullWidth required>
                             <InputLabel id="project-label">Select Project</InputLabel>
@@ -124,9 +149,6 @@ const AddExpense = () => {
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Typography variant="h6" gutterBottom>
-                            {/* Add any title or heading if needed */}
-                        </Typography>
                         <Button
                             variant="outlined"
                             color="primary"
@@ -134,48 +156,46 @@ const AddExpense = () => {
                         >
                             Add Item
                         </Button>
-                        {invoiceItems.map((item, index) => (
+                        {expenseItems.map((item, index) => (
                             <Box key={index} mt={2}>
                                 <Grid container spacing={2} alignItems="center">
                                     <Grid item xs={12} sm={8}>
                                         <TextField
                                             label="Description"
-                                            name="itemDesc"
+                                            name="description"
                                             variant="outlined"
                                             fullWidth
-                                            value={item.itemDesc}
-                                            onChange={(event) => handleSubmit(index, event)}
+                                            value={item.description}
+                                            onChange={(event) => handleItemChange(index, event)}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={2}>
                                         <TextField
-                                            type="number"
-                                            label="Rate"
-                                            name="itemRate"
+                                            type="numeric"
+                                            label="Amount"
+                                            name="amount"
                                             variant="outlined"
                                             fullWidth
-                                            value={item.itemRate}
-                                            onChange={(event) => handleSubmit(index, event)}
+                                            value={item.amount}
+                                            onChange={(event) => handleItemChange(index, event)}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={2}>
-                                        <Box display="flex" justifyContent="center" >
+                                        <Box display="flex" justifyContent="center">
                                             <Button
                                                 variant="outlined"
                                                 color="secondary"
                                                 onClick={() => removeItem(index)}
-                                                startIcon={<DeleteIcon />}alignItems="center"
+                                                startIcon={<DeleteIcon />}
                                             >
+                                                Remove
                                             </Button>
                                         </Box>
                                     </Grid>
                                 </Grid>
                             </Box>
-
-
                         ))}
                     </Grid>
-                    {/* Submit Button */}
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" type="submit" fullWidth disabled={loading}>
                             {loading ? 'Adding Expense...' : 'Add Expense'}
@@ -184,7 +204,6 @@ const AddExpense = () => {
                 </Grid>
             </form>
 
-            {/* Success/Error Snackbar */}
             {success && (
                 <Snackbar open autoHideDuration={6000} onClose={() => setSuccess('')}>
                     <Alert onClose={() => setSuccess('')} severity="success">
@@ -200,7 +219,6 @@ const AddExpense = () => {
                 </Snackbar>
             )}
         </Container>
-
     );
 };
 
