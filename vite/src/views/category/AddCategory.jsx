@@ -21,7 +21,7 @@ const AddCategory = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/clientcategories', {
+      const response = await fetch('http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/clientcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

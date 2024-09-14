@@ -44,7 +44,7 @@ const ProjectList = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projects?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
+      const response = await fetch(`http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/projects?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
@@ -58,7 +58,7 @@ const ProjectList = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projectcategories');
+      const response = await fetch('http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/projectcategories');
       if (!response.ok) {
         throw new Error('Failed to fetch project categories');
       }
@@ -76,7 +76,7 @@ const ProjectList = () => {
 
   const fetchClientCategories = async () => {
     try {
-      const response = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/clients');
+      const response = await fetch('http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/clients');
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -125,7 +125,7 @@ const ProjectList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projects/${projectToDelete._id}`, {
+      const response = await fetch(`http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/projects/${projectToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -144,7 +144,7 @@ const ProjectList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projects/${projectToUpdate._id}`, {
+      const response = await fetch(`http://ec2-3-108-236-90.ap-south-1.compute.amazonaws.com:8181/projects/${projectToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
