@@ -471,6 +471,5 @@ const EditInvoice = () => {
   );
 };
 
-//intial commit
 
 export default EditInvoice;
