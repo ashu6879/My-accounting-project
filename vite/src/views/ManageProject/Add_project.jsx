@@ -25,7 +25,7 @@ const AddProject = () => {
   useEffect(() => {
     const fetchClientsAndCategories = async () => {
       try {
-        const clientResponse = await fetch('https://ekarigar-accounts.onrender.com/clients');
+        const clientResponse = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/clients');
         if (!clientResponse.ok) {
           throw new Error('Failed to fetch clients');
         }
@@ -33,7 +33,7 @@ const AddProject = () => {
         console.log('Fetched Clients:', clientData); // Add this line to check client data
         setClients(clientData);
   
-        const categoryResponse = await fetch('https://ekarigar-accounts.onrender.com/projectcategories');
+        const categoryResponse = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projectcategories');
         if (!categoryResponse.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -63,7 +63,7 @@ const AddProject = () => {
     console.log('Submitting Project Data:', projectData); // Add this line to check data before submission
   
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/projects', {
+      const response = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

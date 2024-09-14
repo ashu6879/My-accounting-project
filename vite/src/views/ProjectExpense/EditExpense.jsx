@@ -30,14 +30,14 @@ const EditProjectExpense = () => {
     const fetchExpensesAndProjects = useCallback(async () => {
         setLoading(true); // Start loading
         try {
-            const expenseResponse = await fetch('https://ekarigar-accounts.onrender.com/expense');
+            const expenseResponse = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/expense');
             if (!expenseResponse.ok) throw new Error('Failed to fetch expenses');
             const expensesData = await expenseResponse.json();
             setExpenses(expensesData);
 
             const projectIDs = Array.from(new Set(expensesData.map(expense => expense.projectID)));
 
-            const projectResponse = await fetch('https://ekarigar-accounts.onrender.com/projects');
+            const projectResponse = await fetch('http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/projects');
             if (!projectResponse.ok) throw new Error('Failed to fetch projects');
             const projectsData = await projectResponse.json();
 
@@ -71,7 +71,7 @@ const EditProjectExpense = () => {
     const handleUpdate = async () => {
         try {
             const updatePromises = updateDetails.map(expense =>
-                fetch(`https://ekarigar-accounts.onrender.com/Expense/${expense._id}`, {
+                fetch(`http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/Expense/${expense._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ const EditProjectExpense = () => {
             const projectExpenses = expenses.filter(expense => expense.projectID === projectToDelete.projectID);
 
             const deletePromises = projectExpenses.map(expense =>
-                fetch(`https://ekarigar-accounts.onrender.com/Expense/${expense._id}`, {
+                fetch(`http://ec2-13-233-96-56.ap-south-1.compute.amazonaws.com:8181/Expense/${expense._id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
