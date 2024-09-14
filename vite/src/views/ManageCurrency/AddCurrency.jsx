@@ -46,7 +46,7 @@ const AddiconCurrency = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/currencies', {
+      const response = await fetch('http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/currencies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

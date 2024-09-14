@@ -38,7 +38,7 @@ const EditInvoice = () => {
 
   const fetchInvoices = async (pageNumber) => {
     try {
-      const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoices?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`);
+      const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/invoices?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch invoices');
       }
@@ -56,7 +56,7 @@ const EditInvoice = () => {
   };
   const fetchInvoiceItemsByInvID = async (invID) => {
     try {
-      const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/getInvoiceItemByInvID/${invID}`);
+      const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/getInvoiceItemByInvID/${invID}`);
       if (!response.ok) {
         throw new Error('Failed to fetch invoice items');
       }
@@ -91,7 +91,7 @@ const EditInvoice = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoices/${invoiceToDelete._id}`, {
+      const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/invoices/${invoiceToDelete._id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -115,7 +115,7 @@ const EditInvoice = () => {
       const promises = updateItems.map(async (item) => {
         if (item.invtID) {
           // If the item has an invtID, it's an existing item and should be updated.
-          const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoiceItem/${item.invtID}`, {
+          const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/invoiceItem/${item.invtID}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -129,7 +129,7 @@ const EditInvoice = () => {
           }
         } else {
           // If the item doesn't have an invtID, it's a new item and should be created.
-          const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoiceItem`, {
+          const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/invoiceItem`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -201,7 +201,7 @@ const EditInvoice = () => {
       return;
     }
 
-    const apiUrl = `http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoiceItem/${numericInvtID}`;
+    const apiUrl = `http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/invoiceItem/${numericInvtID}`;
 
     try {
       const response = await fetch(apiUrl, {
