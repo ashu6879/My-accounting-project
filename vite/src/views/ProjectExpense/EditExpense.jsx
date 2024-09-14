@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Button, Container, Typography, Snackbar, Alert,
     IconButton, Table, TableBody, TableCell, TableHead,
     TableRow, Dialog, DialogActions, DialogContent,
-    DialogTitle, Box, TextField, MenuItem, Paper, TableContainer
+    DialogTitle, Box, TextField, Paper, TableContainer
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import useAuth from 'hooks/useAuth';
+import Loader from '../../ui-component/loading'; // Import the Loader component
 
 const EditProjectExpense = () => {
     const [projects, setProjects] = useState([]);
@@ -17,51 +18,44 @@ const EditProjectExpense = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [projectToUpdate, setProjectToUpdate] = useState(null);
     const [updateDetails, setUpdateDetails] = useState([]);
+    const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+    const [projectToDelete, setProjectToDelete] = useState(null);
+    const [loading, setLoading] = useState(true); // State for loading
     const { isAuthenticated, loading: authLoading } = useAuth();
 
     useEffect(() => {
-        fetchExpenses();
+        fetchExpensesAndProjects();
     }, []);
 
-    const fetchExpenses = async () => {
+    const fetchExpensesAndProjects = useCallback(async () => {
+        setLoading(true); // Start loading
         try {
-            const response = await fetch('https://ekarigar-accounts.onrender.com/expense');
-            if (!response.ok) {
-                throw new Error('Failed to fetch expenses');
-            }
-            const data = await response.json();
-            //console.log('Fetched expenses:', data); // Log fetched expenses
-            setExpenses(data);
-            const projectIDs = Array.from(new Set(data.map(expense => expense.projectID)));
-            fetchProjects(projectIDs);
-        } catch (error) {
-            setError(error.message);
-        }
-    };
+            const expenseResponse = await fetch('https://ekarigar-accounts.onrender.com/expense');
+            if (!expenseResponse.ok) throw new Error('Failed to fetch expenses');
+            const expensesData = await expenseResponse.json();
+            setExpenses(expensesData);
 
-    const fetchProjects = async (projectIDs) => {
-        try {
-            const response = await fetch('https://ekarigar-accounts.onrender.com/projects');
-            if (!response.ok) {
-                throw new Error('Failed to fetch projects');
-            }
-            const data = await response.json();
-            //console.log('Fetched projects:', data); // Log fetched projects
+            const projectIDs = Array.from(new Set(expensesData.map(expense => expense.projectID)));
 
-            const filtered = data.filter(project => projectIDs.includes(project.projectID));
-            setProjects(filtered);
+            const projectResponse = await fetch('https://ekarigar-accounts.onrender.com/projects');
+            if (!projectResponse.ok) throw new Error('Failed to fetch projects');
+            const projectsData = await projectResponse.json();
 
-            const combinedData = filtered.map(project => ({
+            const filteredProjectsData = projectsData.filter(project => projectIDs.includes(project.projectID));
+            setProjects(filteredProjectsData);
+
+            const combinedData = filteredProjectsData.map(project => ({
                 ...project,
-                expenses: expenses.filter(expense => expense.projectID === project.projectID)
+                expenses: expensesData.filter(expense => expense.projectID === project.projectID)
             }));
-            // console.log(combinedData);
+
             setFilteredProjects(combinedData);
         } catch (error) {
             setError(error.message);
+        } finally {
+            setLoading(false); // End loading
         }
-    };
-
+    }, []);
 
     const handleEdit = (project) => {
         setProjectToUpdate(project);
@@ -82,11 +76,7 @@ const EditProjectExpense = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        ...expense,
-                        description: expense.description,
-                        amount: expense.amount
-                    }),
+                    body: JSON.stringify(expense),
                 })
             );
 
@@ -100,7 +90,6 @@ const EditProjectExpense = () => {
             ));
             handleUpdateDialogClose();
         } catch (error) {
-            console.error(error);
             setError(error.message);
         }
     };
@@ -110,6 +99,44 @@ const EditProjectExpense = () => {
             i === index ? { ...detail, [field]: value } : detail
         ));
     };
+
+    const handleDeleteRequest = (project) => {
+        setProjectToDelete(project);
+        setConfirmationDialogOpen(true);
+    };
+
+    const handleDeleteConfirmation = async () => {
+        if (!projectToDelete) return;
+        try {
+            const projectExpenses = expenses.filter(expense => expense.projectID === projectToDelete.projectID);
+
+            const deletePromises = projectExpenses.map(expense =>
+                fetch(`https://ekarigar-accounts.onrender.com/Expense/${expense._id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+            );
+
+            await Promise.all(deletePromises);
+
+            setSuccess('Expenses deleted successfully');
+            setExpenses(expenses.filter(expense => expense.projectID !== projectToDelete.projectID));
+            setFilteredProjects(filteredProjects.filter(project => project.projectID !== projectToDelete.projectID));
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setConfirmationDialogOpen(false);
+            setProjectToDelete(null);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setConfirmationDialogOpen(false);
+        setProjectToDelete(null);
+    };
+
     if (authLoading) {
         return <div>Loading...</div>;
     }
@@ -117,119 +144,154 @@ const EditProjectExpense = () => {
     if (!isAuthenticated) {
         return null;
     }
+
     return (
         <Container maxWidth="md">
-            <Typography variant="h4" gutterBottom>
-                Edit Project Expenses
-            </Typography>
-            <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                    Project Name
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                    Expense Amount
-                                </Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }} textAlign={'center'}>
-                                    Action
-                                </Typography>
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filteredProjects.map((project) => (
-                            <TableRow key={project.projectID}>
-                                <TableCell>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                        {project.projectTitle}
-                                    </Typography>
-                                </TableCell>
-                                <TableCell>
-                                    <Box>
-                                        {project.expenses.map((expense, index) => (
-                                            <Box key={index} mb={1}>
-                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                    {expense.amount || 0}
-                                                </Typography>
+            {loading ? (
+                <Loader /> // Display loader while fetching data
+            ) : (
+                <>
+                    <Typography variant="h4" gutterBottom>
+                        Edit Project Expenses
+                    </Typography>
+                    <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Project Name
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Expense Details
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }} textAlign={'center'}>
+                                            Action
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredProjects.map((project) => (
+                                    <TableRow key={project.projectID}>
+                                        <TableCell>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                {project.projectTitle}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box>
+                                                {project.expenses.map((expense, index) => (
+                                                    <Box key={index} mb={1}>
+                                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                        {expense.description || ""}-{expense.amount || 0}
+                                                        </Typography>
+                                                    </Box>
+                                                ))}
                                             </Box>
-                                        ))}
-                                    </Box>
-                                </TableCell>
-                                <TableCell align="right">
-                                    <Box sx={{ display: 'flex', gap: 1 }} justifyContent={'center'}>
-                                        <IconButton color="primary" onClick={() => handleEdit(project)}>
-                                            <Edit />
-                                        </IconButton>
-                                        <IconButton color="secondary">
-                                            <Delete />
-                                        </IconButton>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <Box sx={{ display: 'flex', gap: 1 }} justifyContent={'center'}>
+                                                <IconButton color="primary" onClick={() => handleEdit(project)}>
+                                                    <Edit />
+                                                </IconButton>
+                                                <IconButton
+                                                    color="secondary"
+                                                    onClick={() => handleDeleteRequest(project)} // Pass the entire project
+                                                >
+                                                    <Delete />
+                                                </IconButton>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
 
-            <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
-                <DialogTitle>Update Project Expenses</DialogTitle>
-                <DialogContent>
-                    {updateDetails.map((expense, index) => (
-                        <Box key={index} mb={2}>
-                            <TextField
-                                margin="dense"
-                                label="Description"
-                                fullWidth
-                                value={expense.description || ''}
-                                onChange={(e) => handleDetailChange(index, 'description', e.target.value)}
-                            />
-                            <TextField
-                                margin="dense"
-                                label="Amount"
-                                fullWidth
-                                type="number"
-                                value={expense.amount || ''}
-                                onChange={(e) => handleDetailChange(index, 'amount', e.target.value)}
-                            />
-                        </Box>
-                    ))}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleUpdateDialogClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleUpdate} color="secondary">
-                        Update
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                    <Dialog
+                        open={updateDialogOpen}
+                        onClose={handleUpdateDialogClose}
+                        fullWidth
+                        maxWidth="md"
+                    >
+                        <DialogTitle>Update Project Expenses</DialogTitle>
+                        <DialogContent>
+                            {updateDetails.map((expense, index) => (
+                                <Box key={index} mb={2} sx={{ display: 'flex', gap: 2 }}>
+                                    <TextField
+                                        margin="dense"
+                                        label="Description"
+                                        fullWidth
+                                        value={expense.description || ''}
+                                        onChange={(e) => handleDetailChange(index, 'description', e.target.value)}
+                                    />
+                                    <TextField
+                                        margin="dense"
+                                        label="Amount"
+                                        fullWidth
+                                        type="number"
+                                        value={expense.amount || ''}
+                                        onChange={(e) => handleDetailChange(index, 'amount', e.target.value)}
+                                    />
+                                </Box>
+                            ))}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleUpdateDialogClose} color="primary">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleUpdate} color="secondary">
+                                Update
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            <Snackbar
-                open={!!error}
-                autoHideDuration={6000}
-                onClose={() => setError('')}
-            >
-                <Alert onClose={() => setError('')} severity="error">
-                    {error}
-                </Alert>
-            </Snackbar>
+                    <Dialog
+                        open={confirmationDialogOpen}
+                        onClose={handleDeleteCancel}
+                    >
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogContent>
+                            <Typography>
+                                Are you sure you want to delete expenses for the project: <strong>{projectToDelete?.projectTitle}</strong>?
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDeleteCancel} color="primary">
+                                Cancel
+                            </Button>
+                            <Button onClick={handleDeleteConfirmation} color="secondary">
+                                Delete
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            <Snackbar
-                open={!!success}
-                autoHideDuration={6000}
-                onClose={() => setSuccess('')}
-            >
-                <Alert onClose={() => setSuccess('')} severity="success">
-                    {success}
-                </Alert>
-            </Snackbar>
+                    <Snackbar
+                        open={!!error}
+                        autoHideDuration={6000}
+                        onClose={() => setError('')}
+                    >
+                        <Alert onClose={() => setError('')} severity="error">
+                            {error}
+                        </Alert>
+                    </Snackbar>
+
+                    <Snackbar
+                        open={!!success}
+                        autoHideDuration={6000}
+                        onClose={() => setSuccess('')}
+                    >
+                        <Alert onClose={() => setSuccess('')} severity="success">
+                            {success}
+                        </Alert>
+                    </Snackbar>
+                </>
+            )}
         </Container>
     );
 };
