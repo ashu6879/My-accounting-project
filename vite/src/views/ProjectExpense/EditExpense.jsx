@@ -3,8 +3,7 @@ import {
     Button, Container, Typography, Snackbar, Alert,
     IconButton, Table, TableBody, TableCell, TableHead,
     TableRow, Dialog, DialogActions, DialogContent,
-    DialogTitle, Box, TextField, Paper, TableContainer,
-    CircularProgress
+    DialogTitle, Box, TextField, MenuItem, Paper, TableContainer
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import useAuth from 'hooks/useAuth';
@@ -18,8 +17,6 @@ const EditProjectExpense = () => {
     const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
     const [projectToUpdate, setProjectToUpdate] = useState(null);
     const [updateDetails, setUpdateDetails] = useState([]);
-    const [loadingExpenses, setLoadingExpenses] = useState(true); // Loader state for expenses
-    const [loadingProjects, setLoadingProjects] = useState(false); // Loader state for projects
     const { isAuthenticated, loading: authLoading } = useAuth();
 
     useEffect(() => {
@@ -27,31 +24,30 @@ const EditProjectExpense = () => {
     }, []);
 
     const fetchExpenses = async () => {
-        setLoadingExpenses(true); // Start loading expenses
         try {
             const response = await fetch('https://ekarigar-accounts.onrender.com/expense');
             if (!response.ok) {
                 throw new Error('Failed to fetch expenses');
             }
             const data = await response.json();
+            //console.log('Fetched expenses:', data); // Log fetched expenses
             setExpenses(data);
             const projectIDs = Array.from(new Set(data.map(expense => expense.projectID)));
             fetchProjects(projectIDs);
         } catch (error) {
             setError(error.message);
-        } finally {
-            setLoadingExpenses(false); // Stop loading expenses
         }
     };
 
     const fetchProjects = async (projectIDs) => {
-        setLoadingProjects(true); // Start loading projects
         try {
             const response = await fetch('https://ekarigar-accounts.onrender.com/projects');
             if (!response.ok) {
                 throw new Error('Failed to fetch projects');
             }
             const data = await response.json();
+            //console.log('Fetched projects:', data); // Log fetched projects
+
             const filtered = data.filter(project => projectIDs.includes(project.projectID));
             setProjects(filtered);
 
@@ -59,13 +55,13 @@ const EditProjectExpense = () => {
                 ...project,
                 expenses: expenses.filter(expense => expense.projectID === project.projectID)
             }));
+            // console.log(combinedData);
             setFilteredProjects(combinedData);
         } catch (error) {
             setError(error.message);
-        } finally {
-            setLoadingProjects(false); // Stop loading projects
         }
     };
+
 
     const handleEdit = (project) => {
         setProjectToUpdate(project);
@@ -114,7 +110,6 @@ const EditProjectExpense = () => {
             i === index ? { ...detail, [field]: value } : detail
         ));
     };
-
     if (authLoading) {
         return <div>Loading...</div>;
     }
@@ -122,73 +117,66 @@ const EditProjectExpense = () => {
     if (!isAuthenticated) {
         return null;
     }
-
     return (
         <Container maxWidth="md">
             <Typography variant="h4" gutterBottom>
                 Edit Project Expenses
             </Typography>
-            {loadingExpenses || loadingProjects ? ( // Show loader if either loading state is true
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-                    <CircularProgress />
-                </Box>
-            ) : (
-                <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
+            <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                    Project Name
+                                </Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                    Expense Amount
+                                </Typography>
+                            </TableCell>
+                            <TableCell align="right">
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }} textAlign={'center'}>
+                                    Action
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredProjects.map((project) => (
+                            <TableRow key={project.projectID}>
                                 <TableCell>
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        Project Name
+                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                        {project.projectTitle}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        Expense Amount
-                                    </Typography>
+                                    <Box>
+                                        {project.expenses.map((expense, index) => (
+                                            <Box key={index} mb={1}>
+                                                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                                                    {expense.amount || 0}
+                                                </Typography>
+                                            </Box>
+                                        ))}
+                                    </Box>
                                 </TableCell>
                                 <TableCell align="right">
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }} textAlign={'center'}>
-                                        Action
-                                    </Typography>
+                                    <Box sx={{ display: 'flex', gap: 1 }} justifyContent={'center'}>
+                                        <IconButton color="primary" onClick={() => handleEdit(project)}>
+                                            <Edit />
+                                        </IconButton>
+                                        <IconButton color="secondary">
+                                            <Delete />
+                                        </IconButton>
+                                    </Box>
                                 </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredProjects.map((project) => (
-                                <TableRow key={project.projectID}>
-                                    <TableCell>
-                                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                            {project.projectTitle}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Box>
-                                            {project.expenses.map((expense, index) => (
-                                                <Box key={index} mb={1}>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                                                        {expense.amount || 0}
-                                                    </Typography>
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <Box sx={{ display: 'flex', gap: 1 }} justifyContent={'center'}>
-                                            <IconButton color="primary" onClick={() => handleEdit(project)}>
-                                                <Edit />
-                                            </IconButton>
-                                            <IconButton color="secondary">
-                                                <Delete />
-                                            </IconButton>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
             <Dialog open={updateDialogOpen} onClose={handleUpdateDialogClose}>
                 <DialogTitle>Update Project Expenses</DialogTitle>
