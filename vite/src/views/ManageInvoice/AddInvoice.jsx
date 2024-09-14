@@ -31,7 +31,7 @@ const GenerateInvoice = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/clients');
+      const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/clients');
       const data = await response.json();
       setClients(data);
     } catch (error) {
@@ -41,7 +41,7 @@ const GenerateInvoice = () => {
   
   const fetchCurrencies = async () => {
     try {
-      const response = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/currencies');
+      const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/currencies');
       const data = await response.json();
       setCurrencies(data);
     } catch (error) {
@@ -67,7 +67,7 @@ const GenerateInvoice = () => {
       }));
 
       try {
-        const response = await fetch(`http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/getProjectByClientID/${clientID}`);
+        const response = await fetch(`http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/getProjectByClientID/${clientID}`);
         const data = await response.json();
         setProjects(data);
       } catch (error) {
@@ -108,7 +108,7 @@ const GenerateInvoice = () => {
 
   const handleAddCurrency = async () => {
     try {
-      const response = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/currencies', {
+      const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/currencies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ const GenerateInvoice = () => {
 
     try {
       // Create the invoice
-      const createResponse = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/invoices', {
+      const createResponse = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ const GenerateInvoice = () => {
       }
 
       // Fetch the latest invoice ID
-      const invoicesResponse = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/invoices');
+      const invoicesResponse = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoices');
       if (!invoicesResponse.ok) {
         const errorMessage = await invoicesResponse.text();
         throw new Error(errorMessage || 'Failed to fetch invoices');
@@ -192,7 +192,7 @@ const GenerateInvoice = () => {
           throw new Error('Invalid invoice item data');
         }
 
-        const itemResponse = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/invoiceItem', {
+        const itemResponse = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/invoiceItem', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

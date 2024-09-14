@@ -24,7 +24,7 @@ const AddClient = () => {
     // Fetch client categories on component mount
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/clientcategories/all');
+        const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/clientcategories/all');
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -50,7 +50,7 @@ const AddClient = () => {
     setLoading(true); // Set loading to true when form submission starts
 
     try {
-      const response = await fetch('http://ec2-13-233-199-35.ap-south-1.compute.amazonaws.com:8181/clients', {
+      const response = await fetch('http://ec2-35-154-230-63.ap-south-1.compute.amazonaws.com:8181/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
