@@ -26,7 +26,7 @@ const AddExpense = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/projects');
+            const response = await fetch('https://ekarigar-accounts.onrender.com/projects');
             const data = await response.json();
             setProjects(data);
         } catch (error) {
@@ -76,7 +76,7 @@ const AddExpense = () => {
         try {
           // Send each expense item separately
           const responses = await Promise.all(expenseItems.map(async (item) => {
-            const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/Expense', {
+            const response = await fetch('https://ekarigar-accounts.onrender.com/Expense', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

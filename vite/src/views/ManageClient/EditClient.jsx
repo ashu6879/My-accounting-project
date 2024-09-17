@@ -42,7 +42,7 @@ const CategoryList = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clients?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clients?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -56,7 +56,7 @@ const CategoryList = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clientcategories');
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clientcategories');
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
@@ -95,7 +95,7 @@ const CategoryList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clients/${clientToDelete._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clients/${clientToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -114,7 +114,7 @@ const CategoryList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clients/${clientToUpdate._id}`, {
+      const response = await fetch(`https://ekarigar-accounts.onrender.com/clients/${clientToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

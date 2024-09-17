@@ -24,7 +24,7 @@ const AddClient = () => {
     // Fetch client categories on component mount
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clientcategories/all');
+        const response = await fetch('https://ekarigar-accounts.onrender.com/clientcategories/all');
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -50,7 +50,7 @@ const AddClient = () => {
     setLoading(true); // Set loading to true when form submission starts
 
     try {
-      const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/clients', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

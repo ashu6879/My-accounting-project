@@ -70,7 +70,7 @@ const AuthRegister = ({ ...others }) => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/signup', {
+      const response = await fetch('https://ekarigar-accounts.onrender.com/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
