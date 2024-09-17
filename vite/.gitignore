@@ -3,3 +3,5 @@
 # dependencies
 /node_modules
 .env
+admin-frontend.pem
+admin-frontend.ppk
