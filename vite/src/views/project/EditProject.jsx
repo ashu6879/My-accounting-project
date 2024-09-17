@@ -34,7 +34,7 @@ const CategoriesList = () => {
   const fetchCategories = async () => {
     try {
       const response = await fetch(
-        `http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/projectcategories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
+        `http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/projectcategories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
@@ -79,7 +79,7 @@ const CategoriesList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/projectcategories/${categoryToDelete._id}`, {
+      const response = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/projectcategories/${categoryToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -97,7 +97,7 @@ const CategoriesList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/projectcategories/${categoryToUpdate._id}`, {
+      const response = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/projectcategories/${categoryToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

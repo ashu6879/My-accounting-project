@@ -21,7 +21,7 @@ const AddProject = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/projectcategories', {
+      const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/projectcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

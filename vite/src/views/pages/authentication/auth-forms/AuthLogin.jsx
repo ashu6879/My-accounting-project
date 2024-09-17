@@ -66,7 +66,7 @@ const AuthLogin = ({ ...others }) => {
           console.log('Submitting values:', values); // Debugging: Log submitted values
 
           try {
-            const response = await fetch('http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/login', {
+            const response = await fetch('http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/login', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username: values.username, password: values.password }) // Updated payload

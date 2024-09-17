@@ -7,7 +7,7 @@ import 'jspdf-autotable'; // Ensure to import the autotable plugin
 export const generatePDF = async (invoice) => {
     try {
         // Fetch invoice data from API
-        const invoiceResponse = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/getInvoiceItemByInvID/${invoice.invID}`);
+        const invoiceResponse = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/getInvoiceItemByInvID/${invoice.invID}`);
         if (!invoiceResponse.ok) {
             throw new Error(`Failed to fetch invoice data: ${invoiceResponse.statusText}`);
         }
@@ -17,7 +17,7 @@ export const generatePDF = async (invoice) => {
         let currencies = invoice.currency; // Default currency
         if (invoice.currencyID) {
             // Fetch currencies data from API if currencyID is present
-            const currenciesResponse = await fetch(`http://ec2-13-233-251-109.ap-south-1.compute.amazonaws.com:8181/currencies/${invoice.currencyID}`);
+            const currenciesResponse = await fetch(`http://ec2-13-234-31-37.ap-south-1.compute.amazonaws.com:8181/currencies/${invoice.currencyID}`);
             if (!currenciesResponse.ok) {
                 throw new Error(`Failed to fetch currencies data: ${currenciesResponse.statusText}`);
             }
