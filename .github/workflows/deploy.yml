@@ -39,7 +39,7 @@ jobs:
           chmod 600 private_key.pem
 
           # Sync files to the EC2 instance
-          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" ./admin_panel_ekarigar/vite/dist/ $USERNAME@$HOST:/home/ubuntu/admin_panel_ekarigar/vite/
+          rsync -avz -e "ssh -i private_key.pem -o StrictHostKeyChecking=no -v" ./admin_panel_ekarigar/vite/dist/ $USERNAME@$HOST:/home/ubuntu/admin_panel_ekarigar/vite/
 
           # Reload NGINX on the server
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $USERNAME@$HOST "sudo systemctl reload nginx"
+          ssh -i private_key.pem -o StrictHostKeyChecking=no -v $USERNAME@$HOST "sudo systemctl reload nginx"
