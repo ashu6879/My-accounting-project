@@ -1,0 +1,1 @@
+import{j as o}from"./index-DjrlQ2F5.js";import{B as i}from"./OutlinedInput-DsoeenSI.js";import{C as m}from"./CircularProgress-BMgE6Vjs.js";const d=({loading:s,children:t,...r})=>o.jsxs(i,{...r,disabled:s||r.disabled,children:[s&&o.jsx(m,{size:24,sx:{mr:1}}),t]});export{d as L};
