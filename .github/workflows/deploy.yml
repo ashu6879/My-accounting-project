@@ -25,7 +25,7 @@ jobs:
 
       - name: Build project
         run: |
-          cd admin_panel_ekarigar/vite
+          cd vite
           npm run build
 
       - name: Deploy to EC2
