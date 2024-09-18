@@ -43,7 +43,7 @@ jobs:
           echo "Local path before rsync:"
           pwd
           echo "Listing local dist directory:"
-          ls -l ./admin_panel_ekarigar/vite/dist
+          ls -l /home/runner/work/admin_panel_ekarigar/admin_panel_ekarigar/vite/dist
 
           # Debug: Display the remote path
           echo "Checking remote path on EC2 before rsync:"
