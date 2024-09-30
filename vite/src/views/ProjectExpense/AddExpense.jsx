@@ -46,7 +46,7 @@ const AddExpense = () => {
         const { name, value } = event.target;
         setExpenseItems(prevItems => {
             const newItems = [...prevItems];
-            newItems[index] = { ...newItems[index], [name]: value };
+            newItems[index] = { ...newItems[index], [name]: name === 'amount' ? parseFloat(value) : value };
             return newItems;
         });
     };
@@ -99,7 +99,7 @@ const AddExpense = () => {
           setExpenseData({
             projectID: '',
             description: '',
-            amount: '',
+            amount: 0,
           });
           setExpenseItems([{ description: '', amount: 0 }]);
       
