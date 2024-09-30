@@ -21,7 +21,7 @@ const AddProject = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('http://localhost:81/projectcategories', {
+      const response = await fetch('https://my-accounting-u7vs.onrender.com/projectcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

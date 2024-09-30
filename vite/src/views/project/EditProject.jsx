@@ -34,7 +34,7 @@ const CategoriesList = () => {
   const fetchCategories = async () => {
     try {
       const response = await fetch(
-        `http://localhost:81/projectcategories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
+        `https://my-accounting-u7vs.onrender.com/projectcategories?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
@@ -79,7 +79,7 @@ const CategoriesList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:81/projectcategories/${categoryToDelete._id}`, {
+      const response = await fetch(`https://my-accounting-u7vs.onrender.com/projectcategories/${categoryToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -97,7 +97,7 @@ const CategoriesList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:81/projectcategories/${categoryToUpdate._id}`, {
+      const response = await fetch(`https://my-accounting-u7vs.onrender.com/projectcategories/${categoryToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -25,7 +25,7 @@ const AddProject = () => {
   useEffect(() => {
     const fetchClientsAndCategories = async () => {
       try {
-        const clientResponse = await fetch('http://localhost:81/clients');
+        const clientResponse = await fetch('https://my-accounting-u7vs.onrender.com/clients');
         if (!clientResponse.ok) {
           throw new Error('Failed to fetch clients');
         }
@@ -33,7 +33,7 @@ const AddProject = () => {
         console.log('Fetched Clients:', clientData); // Add this line to check client data
         setClients(clientData);
   
-        const categoryResponse = await fetch('http://localhost:81/projectcategories');
+        const categoryResponse = await fetch('https://my-accounting-u7vs.onrender.com/projectcategories');
         if (!categoryResponse.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -63,7 +63,7 @@ const AddProject = () => {
     console.log('Submitting Project Data:', projectData); // Add this line to check data before submission
   
     try {
-      const response = await fetch('http://localhost:81/projects', {
+      const response = await fetch('https://my-accounting-u7vs.onrender.com/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -46,7 +46,7 @@ const AddiconCurrency = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:81/currencies', {
+      const response = await fetch('https://my-accounting-u7vs.onrender.com/currencies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

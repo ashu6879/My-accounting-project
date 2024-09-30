@@ -24,7 +24,7 @@ const AddClient = () => {
     // Fetch client categories on component mount
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:81/clientcategories/all');
+        const response = await fetch('https://my-accounting-u7vs.onrender.com/clientcategories/all');
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -50,7 +50,7 @@ const AddClient = () => {
     setLoading(true); // Set loading to true when form submission starts
 
     try {
-      const response = await fetch('http://localhost:81/clients', {
+      const response = await fetch('https://my-accounting-u7vs.onrender.com/clients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

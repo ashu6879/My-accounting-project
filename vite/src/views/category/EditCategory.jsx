@@ -33,7 +33,7 @@ const CategoryList = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch(`http://localhost:81/clientcategories?page=${page}&limit=${limit}&search=${searchTerm}`);
+      const response = await fetch(`https://my-accounting-u7vs.onrender.com/clientcategories?page=${page}&limit=${limit}&search=${searchTerm}`);
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -71,7 +71,7 @@ const CategoryList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:81/clientcategories/${clientToDelete._id}`, {
+      const response = await fetch(`https://my-accounting-u7vs.onrender.com/clientcategories/${clientToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -89,7 +89,7 @@ const CategoryList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:81/clientcategories/${clientToUpdate._id}`, {
+      const response = await fetch(`https://my-accounting-u7vs.onrender.com/clientcategories/${clientToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

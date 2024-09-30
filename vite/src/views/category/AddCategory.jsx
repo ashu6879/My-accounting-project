@@ -21,7 +21,7 @@ const AddCategory = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:81/clientcategories', {
+      const response = await fetch('https://my-accounting-u7vs.onrender.com/clientcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
