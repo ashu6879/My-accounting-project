@@ -44,7 +44,7 @@ const ProjectList = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
+      const response = await fetch(`http://localhost:81/projects?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch projects');
       }
@@ -58,7 +58,7 @@ const ProjectList = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/projectcategories');
+      const response = await fetch('http://localhost:81/projectcategories');
       if (!response.ok) {
         throw new Error('Failed to fetch project categories');
       }
@@ -76,7 +76,7 @@ const ProjectList = () => {
 
   const fetchClientCategories = async () => {
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/clients');
+      const response = await fetch('http://localhost:81/clients');
       if (!response.ok) {
         throw new Error('Failed to fetch clients');
       }
@@ -125,7 +125,7 @@ const ProjectList = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects/${projectToDelete._id}`, {
+      const response = await fetch(`http://localhost:81/projects/${projectToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -144,7 +144,7 @@ const ProjectList = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`https://ekarigar-accounts.onrender.com/projects/${projectToUpdate._id}`, {
+      const response = await fetch(`http://localhost:81/projects/${projectToUpdate._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

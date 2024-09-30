@@ -21,7 +21,7 @@ const AddProject = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/projectcategories', {
+      const response = await fetch('http://localhost:81/projectcategories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

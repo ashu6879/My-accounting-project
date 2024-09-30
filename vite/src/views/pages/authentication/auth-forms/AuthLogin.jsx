@@ -66,7 +66,7 @@ const AuthLogin = ({ ...others }) => {
           console.log('Submitting values:', values); // Debugging: Log submitted values
 
           try {
-            const response = await fetch('https://ekarigar-accounts.onrender.com/login', {
+            const response = await fetch('http://localhost:81/login', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username: values.username, password: values.password }) // Updated payload

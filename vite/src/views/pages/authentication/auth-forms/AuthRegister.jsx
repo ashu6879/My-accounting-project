@@ -70,7 +70,7 @@ const AuthRegister = ({ ...others }) => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/signup', {
+      const response = await fetch('http://localhost:81/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

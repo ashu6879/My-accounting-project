@@ -46,7 +46,7 @@ const AddiconCurrency = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://ekarigar-accounts.onrender.com/currencies', {
+      const response = await fetch('http://localhost:81/currencies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

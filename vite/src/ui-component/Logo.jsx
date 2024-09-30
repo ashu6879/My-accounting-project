@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 
 // Import the logo images
 import logoDark from 'assets/images/logo-dark.svg';
-import logo from 'assets/images/ekarigarlogo.png';
+import logo from 'assets/images/logo.jpg';
 
 // ==============================|| LOGO ||============================== //
 
@@ -14,7 +14,7 @@ const Logo = () => {
     /**
      * Uncomment the following line to use the image instead of SVG.
      */
-    <img src={logo} alt="Logo" width="75" />
+    <img src={logo} alt="Logo" width="65" />
   
     
       // Alternatively, you can use the dark logo by uncommenting this line:

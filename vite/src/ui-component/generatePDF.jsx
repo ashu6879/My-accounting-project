@@ -7,7 +7,7 @@ import 'jspdf-autotable'; // Ensure to import the autotable plugin
 export const generatePDF = async (invoice) => {
     try {
         // Fetch invoice data from API
-        const invoiceResponse = await fetch(`https://ekarigar-accounts.onrender.com/getInvoiceItemByInvID/${invoice.invID}`);
+        const invoiceResponse = await fetch(`http://localhost:81/getInvoiceItemByInvID/${invoice.invID}`);
         if (!invoiceResponse.ok) {
             throw new Error(`Failed to fetch invoice data: ${invoiceResponse.statusText}`);
         }
@@ -17,7 +17,7 @@ export const generatePDF = async (invoice) => {
         let currencies = invoice.currency; // Default currency
         if (invoice.currencyID) {
             // Fetch currencies data from API if currencyID is present
-            const currenciesResponse = await fetch(`https://ekarigar-accounts.onrender.com/currencies/${invoice.currencyID}`);
+            const currenciesResponse = await fetch(`http://localhost:81/currencies/${invoice.currencyID}`);
             if (!currenciesResponse.ok) {
                 throw new Error(`Failed to fetch currencies data: ${currenciesResponse.statusText}`);
             }

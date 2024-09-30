@@ -44,11 +44,11 @@ const Heading = () => {
       <style>{slideInKeyframes}</style>
       <div style={containerStyle}>
         <h1 style={headingStyle}>
-          Welcome to <span style={textStyle}>Ekarigar</span> <span style={textStyle1}>Accounts</span> Admin Portal.
+          Welcome to <span style={textStyle}>Accounts</span> <span style={textStyle1}>Admin</span>  Portal.
         </h1>
       </div>
     </>
-  );
+  ); 
 };
 
 export default Heading;
