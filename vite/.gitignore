@@ -5,3 +5,5 @@
 .env
 admin-frontend.pem
 admin-frontend.ppk
+dist
+*.pem
