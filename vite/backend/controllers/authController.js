@@ -42,16 +42,6 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Send token to the client
-    res.json({ success: true, token });
   } catch (err) {
     console.error('Error during login:', err); // Log the error for debugging
     res.status(500).json({ success: false, message: 'Server error' });
